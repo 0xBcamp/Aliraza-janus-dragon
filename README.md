@@ -7,9 +7,9 @@
 ---
 
 <div align="center">
-    <audio controls>
-        <source src="./public/ISBN_9783127323207_voice.mp3" type="audio/mp3">
-    </audio>
+    <audio id="audio" preload="auto" volume="0.5" data-loop-track="false" data-change-page-title="false" controls> 
+  <source src="./public/ISBN_9783127323207_voice.mp3" data-track-title="The Voice" /> 
+ </audio> 
 </div>
 
 **⚠️ Mandatory Briefing: It is imperative that you play the audio file above before proceeding. This message contains critical information crucial for the successful execution of your mission.**
