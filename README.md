@@ -1,19 +1,18 @@
 # ChainFusion ID & Finance Hub
 
 <div align="center">
-    <img src="./public/logo.jpg" alt="ChainFusion Logo" style="width: 200px;"> <!-- Adjust the width as needed -->
+    <img src="./public/logo.jpg" alt="ChainFusion Logo" style="width: 200px;">
 </div>
 
 ---
 
-<div align="center">
-    <a href="./public/theVoice.mp4">
-        <img src="./public/theVoice.mp4" alt="Play Video" style="width: 200px">
-    </a>
-</div>
 
 
-**⚠️ Mandatory Briefing: It is imperative that you play the audio file above before proceeding. This message contains critical information crucial for the successful execution of your mission.**
+https://github.com/0xBcamp/Aliraza-janus-dragon/assets/32830427/c13c5f82-ed77-4b0c-8c0e-ca489379ca3d
+
+
+
+**⚠️ Mandatory Briefing: It is imperative that you play the vidoe file above before proceeding. This message contains critical information crucial for the successful execution of your mission.**
 
 ---
 
