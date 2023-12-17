@@ -7,10 +7,11 @@
 ---
 
 <div align="center">
-    <audio controls>
-        <source src="https://github.com/0xBcamp/Aliraza-janus-dragon/blob/main/public/ISBN_9783127323207_voice.mp3" type="audio/mpeg">
-    </audio>
+    <a href="./public/theVoice.mp4">
+        <img src="./public/theVoice.mp4" alt="Play Video" style="width: 200px">
+    </a>
 </div>
+
 
 **⚠️ Mandatory Briefing: It is imperative that you play the audio file above before proceeding. This message contains critical information crucial for the successful execution of your mission.**
 
