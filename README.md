@@ -7,9 +7,9 @@
 ---
 
 <div align="center">
-    <audio id="audio" preload="auto" volume="0.5" data-loop-track="false" data-change-page-title="false" controls> 
-  <source src="./public/ISBN_9783127323207_voice.mp3" data-track-title="The Voice" /> 
- </audio> 
+    <audio controls>
+        <source src="https://github.com/0xBcamp/Aliraza-janus-dragon/blob/main/public/ISBN_9783127323207_voice.mp3" type="audio/mpeg">
+    </audio>
 </div>
 
 **⚠️ Mandatory Briefing: It is imperative that you play the audio file above before proceeding. This message contains critical information crucial for the successful execution of your mission.**
