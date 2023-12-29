@@ -19,7 +19,6 @@ https://github.com/0xBcamp/Aliraza-janus-dragon/assets/32830427/c13c5f82-ed77-4b
 ## Table of Contents
 
 - [ChainFusion ID \& Finance Hub](#chainfusion-id--finance-hub)
-  - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
   - [The Challenge](#the-challenge)
   - [The Solution](#the-solution)
@@ -111,15 +110,27 @@ ChainFusion is poised to be a catalyst in the blockchain and DeFi realms by:
 
 Embark on a journey through the resources that fuel the heart of ChainFusion:
 
-1. **Moon Wallet Odyssey**: [Discover Moon Wallet's capabilities](https://usemoon.ai/), the foundational cornerstone of ChainFusion.
-2. **Moon SDK Chronicles**: [Explore practical applications of Moon SDK](https://github.com/moon-up/moon-sdk/tree/main/examples/moon-siwe-sdk-example) and draw integration inspiration.
-3. **Accounts API Codex**: [Unravel the secrets of the Accounts API](https://github.com/moon-up/moon-sdk-python/blob/main/docs/AccountsApi.md) for backend prowess.
-4. **AI Integration Saga**: [Delve into AI integration](https://python.langchain.com/docs/integrations/tools/chatgpt_plugins) to enhance ChainFusion's capabilities.
-5. **Moon SIWE Epic**: [Examine a live example](https://github.com/ewhal/moon-siwe-example/blob/main/web/src/index.js) of Moon Wallet’s integration and strength.
-6. **React Hooks Enigma**: [Uncover the mysteries of Moon React hooks](https://github.com/moon-up/moon-sdk/blob/main/packages/moon-react/src/hooks/useMoon.ts) for intuitive UI design.
-7. **Moon API Tome**: [Navigate the comprehensive Moon API](https://docs.usemoon.ai/api) for advanced functionality insights.
-8. **Python SDK Scrolls**: [Embark on a journey with Moon SDK's Python documentation](https://github.com/moon-up/moon-sdk-python/tree/main/docs) for Python-based integrations.
-9. **Master Plan Compendium**: [Access the detailed master plan](https://docs.google.com/document/d/1Muqq1OAqLg6gQ6A1pycl0cTqAu4x08INJrXFW5Mn9v4/edit) for deep strategic insights.
+- **Moon Wallet Odyssey**: [Discover Moon Wallet's capabilities](https://usemoon.ai/), the foundational cornerstone of ChainFusion.
+- **Moon SDK Chronicles**: [Explore practical applications of Moon SDK](https://github.com/moon-up/moon-sdk/tree/main/examples/moon-siwe-sdk-example) and draw integration inspiration.
+- **Moon SDK Packages**: [Explore all the packages regarding Moon SDK](https://github.com/moon-up/moon-sdk/tree/main/packages) for proper integration and installation. These packages have:
+  - Moon-API is the core API call logic
+  - Moon-ethers is ethers.js provider and signer classes
+  - Moon-rainbowkit allows you to plug moon into rainbow kit
+  - Moon-react is a work in progress but will eventually contain a lot of boilerplate components and hooks for moon
+  - Moon-sdk is the core logic which contains all session management logic as well as ensuring compatiblity to the wider ecosystem.
+  - Moon-types is for shared typings across the moon-sdk project
+  - Moon-wagmi-connector is a wagmi connector
+- **Moon Auth Token**: With moon-sdk we create an instance of the sub api classes in the moon-sdk and expose them and then also set tokens on updates with all of them.
+  - [Configuration snippet security-related settings for AccountsSDK](https://github.com/moon-up/moon-sdk/blob/main/packages/moon-sdk/src/moon.ts#L400)
+  - [Configuration snippet for initializing an instance of Accounts](https://github.com/moon-up/moon-sdk/blob/main/packages/moon-sdk/src/moon.ts#L84)
+  - [Authorization header using a JWT (JSON Web Token)](https://github.com/moon-up/moon-sdk/blob/main/packages/moon-sdk/src/auth.ts#L3)
+- **Accounts API Codex**: [Unravel the secrets of the Accounts API](https://github.com/moon-up/moon-sdk-python/blob/main/docs/AccountsApi.md) for backend prowess.
+- **AI Integration Saga**: [Delve into AI integration](https://python.langchain.com/docs/integrations/tools/chatgpt_plugins) to enhance ChainFusion's capabilities.
+- **Moon SIWE Epic**: [Examine a live example](https://github.com/ewhal/moon-siwe-example/blob/main/web/src/index.js) of Moon Wallet’s integration and strength.
+- **React Hooks Enigma**: [Uncover the mysteries of Moon React hooks](https://github.com/moon-up/moon-sdk/blob/main/packages/moon-react/src/hooks/useMoon.ts) for intuitive UI design.
+- **Moon API Tome**: [Navigate the comprehensive Moon API](https://docs.usemoon.ai/api) for advanced functionality insights.
+- **Python SDK Scrolls**: [Embark on a journey with Moon SDK's Python documentation](https://github.com/moon-up/moon-sdk-python/tree/main/docs) for Python-based integrations.
+- **Master Plan Compendium**: [Access the detailed master plan](https://docs.google.com/document/d/1Muqq1OAqLg6gQ6A1pycl0cTqAu4x08INJrXFW5Mn9v4/edit) for deep strategic insights.
 
 ---
 
