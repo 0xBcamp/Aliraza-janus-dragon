@@ -124,6 +124,9 @@ Embark on a journey through the resources that fuel the heart of ChainFusion:
   - [Configuration snippet security-related settings for AccountsSDK](https://github.com/moon-up/moon-sdk/blob/main/packages/moon-sdk/src/moon.ts#L400)
   - [Configuration snippet for initializing an instance of Accounts](https://github.com/moon-up/moon-sdk/blob/main/packages/moon-sdk/src/moon.ts#L84)
   - [Authorization header using a JWT (JSON Web Token)](https://github.com/moon-up/moon-sdk/blob/main/packages/moon-sdk/src/auth.ts#L3)
+- **Example Moon Apps**: Some example moon apps to consider for learning and proper understanding on how to integrate Moon wallet with any project
+  - [Moon authentication chat example](https://github.com/moon-up/moon-sdk/tree/main/examples/moon-sdk-authentication-chat-example-app)
+  - [Working BCAMP tutorial by Gerdusx](https://github.com/0xBcamp/Gerdusx-janus-dragon/tree/main/bcamp-tutorial/client)
 - **Accounts API Codex**: [Unravel the secrets of the Accounts API](https://github.com/moon-up/moon-sdk-python/blob/main/docs/AccountsApi.md) for backend prowess.
 - **AI Integration Saga**: [Delve into AI integration](https://python.langchain.com/docs/integrations/tools/chatgpt_plugins) to enhance ChainFusion's capabilities.
 - **Moon SIWE Epic**: [Examine a live example](https://github.com/ewhal/moon-siwe-example/blob/main/web/src/index.js) of Moon Wallet’s integration and strength.
