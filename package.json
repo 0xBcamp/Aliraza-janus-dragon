@@ -1,0 +1,35 @@
+{
+  "name": "nextjs-modal-quick-start",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "//IMP START": "IMP START - Web3Auth Installation",
+  "dependencies": {
+    "@alchemy/aa-accounts": "^2.4.0",
+    "@alchemy/aa-alchemy": "^2.4.0",
+    "@alchemy/aa-core": "^2.3.1",
+    "@web3auth/base": "^7.2.1",
+    "@web3auth/modal": "^7.3.0",
+    "dotenv": "^16.4.1",
+    "next": "13.4.9",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "viem": "^1.21.4",
+    "web3": "^4.1.1"
+  },
+  "//IMP END": "IMP END - Web3Auth Installation",
+  "devDependencies": {
+    "@types/elliptic": "^6.4.14",
+    "@types/node": "20.4.1",
+    "@types/react": "18.2.14",
+    "@types/react-dom": "18.2.7",
+    "eslint": "8.44.0",
+    "eslint-config-next": "13.4.9",
+    "typescript": "^5.1.6"
+  }
+}
