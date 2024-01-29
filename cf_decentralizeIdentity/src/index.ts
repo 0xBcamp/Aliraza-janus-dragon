@@ -50,8 +50,8 @@ export class DecentralizeIdentity {
 
   verifyDID = async (did: string, address: string) => {
     try{
-      const user_dids = await contract.maxDIDs(address);
-      console.log(user_dids);
+      // const user_dids = await contract.maxDIDs(address);
+      // console.log(user_dids);
       // return true;
     } catch(error){
       console.log(error);
@@ -69,10 +69,11 @@ const main = async () => {
   console.log(`Contract address: ${await contract.getAddress()} \nUser: ${wallet.address}`);
   const decentralizedIdentity: DecentralizeIdentity = new DecentralizeIdentity();
   const did: string = decentralizedIdentity.createIdentifier(
-    "test",
+    "college",
     wallet.address
   );
+  console.log(`Your Decentralize Identifier: ${did}`);
   // await decentralizedIdentity.storeDID(did, wallet.address);
-  decentralizedIdentity.verifyDID('',wallet.address);
+  // decentralizedIdentity.verifyDID('',wallet.address);
 };
 main();
