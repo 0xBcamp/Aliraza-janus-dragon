@@ -39,26 +39,56 @@ export class DecentralizeIdentity {
     return did;
   };
 
+  /**
+   * @dev This function stores the DID in the wallet of the user on the blockchain
+   * @param did decentralize identifier
+   * @param address wallet address of user
+   */
   storeDID = async (did: string, address: string) => {
     try{
-      // await contract.;
-      console.log(`DID {${did}} assigned successfully.`);
+      console.log(`Storing DID {${did}} on address {${address}}...`);
+      await contract.assignDID(address, did);
+      console.log(`ONCHAIN => Identity assigned successfully.`);
     } catch(error){
       console.log(error);
     }
   }
 
-  verifyDID = async (did: string, address: string) => {
+  /**
+   * @notice This function do double verification of the did on both OnChain and OffChain.
+   * @param did decentralize identifier of the user to verify
+   * @param address public key/wallet address
+   * @returns verification check (TRUE or FALSE)
+   */
+  verifyDID = async (did: string, address: string): Promise<boolean | undefined> => {
     try{
-      // const user_dids = await contract.maxDIDs(address);
-      // console.log(user_dids);
-      // return true;
+      console.log("Verifying Identity...");
+      const user_dids: string[] = await contract.getDIDs(address);
+      const isDidOnChainVerified: boolean = user_dids.includes(did);
+      const name: string = did.split(":")[1];
+      const expected_did:string = this.createIdentifier(name, address);
+      return did === expected_did && isDidOnChainVerified;
     } catch(error){
       console.log(error);
     }
   };
 
-  issueCredential = async () => {}
+  issueCredential = async (issuer_did: string, holder_did: string) => {
+    const universityDegree: {
+      name: string;
+      degree: string;
+      program: string;
+      date: Date;
+      did: string;
+    } = {
+      name: "Stanford University",
+      degree: "Masters",
+      program: "Computer Science",
+      date: new Date(),
+      did: issuer_did
+    }
+  }
+
 
   verifyCredential = async () => {}
 }
@@ -68,12 +98,23 @@ const main = async () => {
   await initializeWalletAndContract();
   console.log(`Contract address: ${await contract.getAddress()} \nUser: ${wallet.address}`);
   const decentralizedIdentity: DecentralizeIdentity = new DecentralizeIdentity();
-  const did: string = decentralizedIdentity.createIdentifier(
-    "college",
+  const issuer_did: string = decentralizedIdentity.createIdentifier(
+    "university",
     wallet.address
   );
-  console.log(`Your Decentralize Identifier: ${did}`);
-  // await decentralizedIdentity.storeDID(did, wallet.address);
-  // decentralizedIdentity.verifyDID('',wallet.address);
+  console.log(`Generated Local Identifier: ${issuer_did}`);
+  // const holder_did: string = decentralizedIdentity.createIdentifier(
+  //   "education",
+  //   "0x672BeB69B7129762fB2847bdA5f73E75029c9349"
+  // );
+  // console.log(`Holder Decentralize Identifier: ${holder_did}`);
+  // const holder_address: string = "0x672BeB69B7129762fB2847bdA5f73E75029c9349";
+  console.log('\n');
+  await decentralizedIdentity.storeDID(issuer_did, wallet.address);
+  setTimeout(async () => {
+    const isDidVerified: boolean | undefined = await decentralizedIdentity.verifyDID(issuer_did, wallet.address);
+  console.log(`\n${issuer_did} verified: ${String(isDidVerified).toUpperCase()}`);
+  }, 1000);
+  
 };
 main();
