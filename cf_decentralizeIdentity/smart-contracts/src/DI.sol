@@ -5,10 +5,16 @@ import {console} from "forge-std/Script.sol";
 contract DecentralizeIdentity {
     error MAX_DIDs_Created(uint256 _dids);
 
+    enum DIDStatus {
+        ACTIVE,
+        EXPIRED
+    }
+
     uint8 private constant MAX_DIDs = 10;
 
     mapping(string did => bytes32[] credentials) private didToCredentials;
     mapping(address => string[]) private addressToDIDs;
+    mapping(string => DIDStatus) private didToStatus;
     
     event CredentialIssued(string holder_did, bytes32 credential);
 
@@ -23,6 +29,11 @@ contract DecentralizeIdentity {
         uint256 userDIDs = addressToDIDs[_user].length + 1;
         if (userDIDs > MAX_DIDs) revert MAX_DIDs_Created(userDIDs);
         addressToDIDs[_user].push(_did);
+    }
+
+    function removeDID(address _user, string memory _did) external {
+        addressToDIDs[_user].length - 1;
+        didToStatus[_did] = DIDStatus.EXPIRED;
     }
 
     /**
@@ -50,5 +61,9 @@ contract DecentralizeIdentity {
 
     function maxDIDs() external pure returns (uint8) {
         return MAX_DIDs;
+    }
+
+    function getDIDStatus(string memory did) external view returns (DIDStatus) {
+        return didToStatus[did];
     }
 }
