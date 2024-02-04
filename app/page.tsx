@@ -1,454 +1,229 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-shadow */
+import Link from "next/link";
+import React from "react";
+import Navbar from "./navbar";
+import { Container, Box, Text, Stack } from "@chakra-ui/layout";
+import Image from "next/image";
+import { Card } from "@chakra-ui/card";
 
-"use client";
-
-import { useEffect, useState } from "react";
-import {
-  LightSmartContractAccount,
-  getDefaultLightAccountFactoryAddress,
-} from "@alchemy/aa-accounts";
-import { AlchemyProvider } from "@alchemy/aa-alchemy";
-import { LocalAccountSigner, type Hex, SmartAccountSigner, WalletClientSigner } from "@alchemy/aa-core";
-import { sepolia } from "viem/chains";
-// IMP START - Quick Start
-import { Web3Auth } from "@web3auth/modal";
-import { CHAIN_NAMESPACES, IProvider } from "@web3auth/base";
-// IMP END - Quick Start
-import Web3 from "web3";
-import { createWalletClient, custom, encodeFunctionData } from "viem";
-import CounterABI from "../artifacts/contracts/Counter.sol/Counter.json";
-
-require('dotenv').config()
-
-// IMP START - SDK Initialization
-// IMP START - Dashboard Registration
-const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string; // get from https://dashboard.web3auth.io
-// IMP END - Dashboard Registration
-
-const chainConfig = {
-  chainNamespace: CHAIN_NAMESPACES.EIP155,
-  chainId: "0x1", // Please use 0x1 for Mainnet
-  rpcTarget: "https://rpc.ankr.com/eth",
-  displayName: "Ethereum Mainnet",
-  blockExplorer: "https://etherscan.io/",
-  ticker: "ETH",
-  tickerName: "Ethereum",
-};
-
-const web3auth = new Web3Auth({
-  clientId,
-  chainConfig,
-  web3AuthNetwork: "sapphire_mainnet",
-});
-// IMP END - SDK Initialization
-
-function App() {
-  const [provider, setProvider] = useState<IProvider | null>(null);
-  const [alchemyProvider, setAlchemyProvider] = useState<AlchemyProvider | null>(null);
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const init = async () => {
-      try {
-        // IMP START - SDK Initialization
-        await web3auth.initModal();
-        // IMP END - SDK Initialization
-        setProvider(web3auth.provider);
-         const walletClient = createWalletClient({
-      chain: sepolia, // can provide a different chain here
-      transport: custom(web3auth.provider as any),
-    });
-
-    const signer: SmartAccountSigner = new WalletClientSigner(
-      walletClient,
-      "json-rpc" // signerType
-    );
-    // IMP END - Login
-    const chain = sepolia;
-
-    // Create a provider to send user operations from your smart account
-    const alchemyProvider = new AlchemyProvider({
-      // get your Alchemy API key at https://dashboard.alchemy.com
-      apiKey: process.env.NEXT_PUBLIC_API_KEY as string,
-      chain,
-    }).connect(
-      (rpcClient) =>
-        new LightSmartContractAccount({
-          rpcClient,
-          owner:signer,
-          chain,
-          factoryAddress: getDefaultLightAccountFactoryAddress(chain),
-        })
-    );
-    setAlchemyProvider(alchemyProvider);
-
-        if (web3auth.connected) {
-          setLoggedIn(true);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    init();
-  }, []);
-
-  const login = async () => {
-    // IMP START - Login
-    const web3authProvider = await web3auth.connect();
-    console.log(web3authProvider);
-    const web3 = new Web3(web3authProvider as any);
-    console.log(web3.provider);
-    console.log(await web3.eth.getAccounts());
-    const walletClient = createWalletClient({
-      chain: sepolia, // can provide a different chain here
-      transport: custom(web3authProvider as any),
-    });
-
-    const signer: SmartAccountSigner = new WalletClientSigner(
-      walletClient,
-      "json-rpc" // signerType
-    );
-    // IMP END - Login
-    setProvider(web3authProvider);
-    const chain = sepolia;
-
-    // Create a provider to send user operations from your smart account
-    const alchemyProvider = new AlchemyProvider({
-      // get your Alchemy API key at https://dashboard.alchemy.com
-      apiKey: process.env.NEXT_PUBLIC_API_KEY as string,
-      chain,
-    }).connect(
-      (rpcClient) =>
-        new LightSmartContractAccount({
-          rpcClient,
-          owner:signer,
-          chain,
-          factoryAddress: getDefaultLightAccountFactoryAddress(chain),
-        })
-    );
-    setAlchemyProvider(alchemyProvider);
-    if (web3auth.connected) {
-      setLoggedIn(true);
-    }
-  };
-
-  const getUserInfo = async () => {
-    // IMP START - Get User Information
-    const user = await web3auth.getUserInfo();
-    // IMP END - Get User Information
-    uiConsole(user);
-  };
-
-  const logout = async () => {
-    // IMP START - Logout
-    await web3auth.logout();
-    // IMP END - Logout
-    setProvider(null);
-    setLoggedIn(false);
-    uiConsole("logged out");
-  };
-
-  // IMP START - Blockchain Calls
-  const getAccounts = async () => {
-    if (!alchemyProvider) {
-      uiConsole("provider not initialized yet");
-      return;
-    }
-
-    // Get user's Ethereum public address
-    const address = await alchemyProvider?.getAddress();
-    uiConsole(address);
-  };
-
-  const getBalance = async () => {
-    if (!alchemyProvider) {
-      uiConsole("provider not initialized yet");
-      return;
-    }
-
-    const web3 = new Web3(alchemyProvider as any);
-
-    const address = await alchemyProvider.getAddress();
-    console.log(address);
-    // Get user's balance in ether
-    const balance = web3.utils.fromWei(
-      await web3.eth.getBalance(address), // Balance is in wei
-      "ether"
-    );
-    uiConsole(balance);
-  };
-
-  const increment = async () => {
-    const uoCallData = encodeFunctionData({
-      abi: CounterABI.abi,
-      functionName: "increment"
-    });
-    alchemyProvider?.withAlchemyGasManager({
-      policyId: process.env.NEXT_PUBLIC_POLICY_ID as string, // replace with your policy id, get yours at https://dashboard.alchemy.com/
-    });
-
-    // If gas sponsorship ineligible, baypass paymaster middleware by passing in the paymasterAndData override
-
-    // Empty paymasterAndData indicates that there will be no paymaster involved
-    // and the user will be paying for the gas fee even when `withAlchemyGasManager` is configured on the provider
-
-    const elligibility = await alchemyProvider?.checkGasSponsorshipEligibility({
-      target: "0xB043083EcF02012b58FBCDe05234AB6818334Cc1",
-      data: uoCallData
-    });
-    console.log(elligibility);
-    // if `elligibility` === false, inform users about their ineligibility,
-    // either notifying or asking for consent to proceed with gas fee being paid from their account balance
-
-    // To proceed with bypassing the paymster middleware
-    const overrides:any = { paymasterAndData: "0x" };
-
-    const uo = await alchemyProvider?.sendUserOperation(
-      {
-        target: "0xB043083EcF02012b58FBCDe05234AB6818334Cc1",
-        data: uoCallData,
-      },
-      elligibility ? undefined : overrides // for ineligible user operations, set the paymasterAndData override
-    );
-
-    const txHash = await alchemyProvider?.waitForUserOperationTransaction(uo!.hash);
-
-    console.log(txHash);
-  }
-
-  const decrement = async () => {
-        const uoCallData = encodeFunctionData({
-      abi: CounterABI.abi,
-      functionName: "decrement"
-    });
-    alchemyProvider?.withAlchemyGasManager({
-      policyId: "33354292-10cc-4068-8126-0265735faeff", // replace with your policy id, get yours at https://dashboard.alchemy.com/
-    });
-
-    const elligibility = await alchemyProvider?.checkGasSponsorshipEligibility({
-      target: "0xB043083EcF02012b58FBCDe05234AB6818334Cc1",
-      data: uoCallData
-    });
-    console.log(elligibility);
-    // if `elligibility` === false, inform users about their ineligibility,
-    // either notifying or asking for consent to proceed with gas fee being paid from their account balance
-
-    // To proceed with bypassing the paymster middleware
-    const overrides:any = { paymasterAndData: "0x" };
-
-    const uo = await alchemyProvider?.sendUserOperation(
-      {
-        target: "0xB043083EcF02012b58FBCDe05234AB6818334Cc1",
-        data: uoCallData,
-      },
-      elligibility ? undefined : overrides // for ineligible user operations, set the paymasterAndData override
-    );
-
-    const txHash = await alchemyProvider?.waitForUserOperationTransaction(uo!.hash);
-
-    console.log(txHash);
-  }
-
-  const tripleIncrement = async () => {
-    const uoCallData = encodeFunctionData({
-      abi: CounterABI.abi,
-      functionName: "increment"
-    });
-    alchemyProvider?.withAlchemyGasManager({
-      policyId: process.env.NEXT_PUBLIC_POLICY_ID as string, // replace with your policy id, get yours at https://dashboard.alchemy.com/
-    });
-
-    const elligibility = await alchemyProvider?.checkGasSponsorshipEligibility({
-      target: "0xB043083EcF02012b58FBCDe05234AB6818334Cc1",
-      data: uoCallData
-    });
-    console.log(elligibility);
-    // if `elligibility` === false, inform users about their ineligibility,
-    // either notifying or asking for consent to proceed with gas fee being paid from their account balance
-
-    // To proceed with bypassing the paymster middleware
-    const overrides:any = { paymasterAndData: "0x" };
-
-    const uo = await alchemyProvider?.sendUserOperation([
-  {
-      target: "0xB043083EcF02012b58FBCDe05234AB6818334Cc1",
-      data: uoCallData,
-    },
-    {
-      target: "0xB043083EcF02012b58FBCDe05234AB6818334Cc1",
-      data: uoCallData,
-    },
-    {
-      target: "0xB043083EcF02012b58FBCDe05234AB6818334Cc1",
-      data: uoCallData,
-    },
-],
-      elligibility ? undefined : overrides // for ineligible user operations, set the paymasterAndData override
-);
-
-    const txHash = await alchemyProvider?.waitForUserOperationTransaction(uo!.hash);
-
-    console.log(txHash);
-  }
-
-  const tripleDecrement = async () => {
-        const uoCallData = encodeFunctionData({
-      abi: CounterABI.abi,
-      functionName: "decrement"
-    });
-    alchemyProvider?.withAlchemyGasManager({
-      policyId: process.env.NEXT_PUBLIC_POLICY_ID as string, // replace with your policy id, get yours at https://dashboard.alchemy.com/
-    });
-
-    const elligibility = await alchemyProvider?.checkGasSponsorshipEligibility({
-      target: "0xB043083EcF02012b58FBCDe05234AB6818334Cc1",
-      data: uoCallData
-    });
-    console.log(elligibility);
-    // if `elligibility` === false, inform users about their ineligibility,
-    // either notifying or asking for consent to proceed with gas fee being paid from their account balance
-
-    // To proceed with bypassing the paymster middleware
-    const overrides:any = { paymasterAndData: "0x" };
-
-    const uo = await alchemyProvider?.sendUserOperation([
-  {
-      target: "0xB043083EcF02012b58FBCDe05234AB6818334Cc1",
-      data: uoCallData,
-    },
-    {
-      target: "0xB043083EcF02012b58FBCDe05234AB6818334Cc1",
-      data: uoCallData,
-    },
-    {
-      target: "0xB043083EcF02012b58FBCDe05234AB6818334Cc1",
-      data: uoCallData,
-    },
-],
-      elligibility ? undefined : overrides // for ineligible user operations, set the paymasterAndData override
-);
-
-    const txHash = await alchemyProvider?.waitForUserOperationTransaction(uo!.hash);
-
-    console.log(txHash);
-  }
-
-  const signMessage = async () => {
-    if (!provider) {
-      uiConsole("provider not initialized yet");
-      return;
-    }
-    const web3 = new Web3(provider as any);
-
-    // Get user's Ethereum public address
-    const fromAddress = (await web3.eth.getAccounts())[0];
-
-    const originalMessage = "YOUR_MESSAGE";
-
-    // Sign the message
-    const signedMessage = await web3.eth.personal.sign(
-      originalMessage,
-      fromAddress,
-      "test password!" // configure your own password here.
-    );
-    uiConsole(signedMessage);
-  };
-  // IMP END - Blockchain Calls
-
-  function uiConsole(...args: any[]): void {
-    const el = document.querySelector("#console>p");
-    if (el) {
-      el.innerHTML = JSON.stringify(args || {}, null, 2);
-      console.log(...args);
-    }
-  }
-
-  const loggedInView = (
+const page = () => {
+  return (
     <>
-      <div className="flex-container">
-        <div>
-          <button onClick={getUserInfo} className="card">
-            Get User Info
-          </button>
+      <Navbar />
+      <Stack
+        direction="row"
+        justifyContent="space-around"
+        alignItems="center"
+        h="55vh"
+      >
+        {/* Title Side */}
+        <Card
+          bg="#a75af7"
+          width="400px"
+          height="400px"
+          ml="20%"
+          mt="20"
+          padding="10"
+          borderRadius="35"
+          className="text-white text-center items-center justify-center"
+        >
+          <h1 className="text-white text-4xl md:text-6xl font-bold">
+            ChainFusion
+          </h1>
+          <h1 className="text-white text-4xl md:text-4xl font-bold mt-4">
+            Onboarding & Identity Management
+          </h1>
+          <p className="text-white mt-8 text-lg">
+            Welcome to ChainFusion, your hub for identity management and
+            decentralized finance. Explore a world of security, transparency,
+            and financial freedom.
+          </p>
+        </Card>
+
+        {/* Logo Side */}
+        <Container width="400px" height="400px" mt="-10" mr="20%">
+          <Image
+            width="400"
+            height="400"
+            src="/chainfusion.png"
+            alt="Your Logo"
+            className=" z-20 absolute"
+          />
+          <svg
+            viewBox="0 0 200 200"
+            width="700"
+            height="700"
+            xmlns="http://www.w3.org/2000/svg"
+            className="z-1 absolute"
+          >
+            <path
+              fill="#c59efa"
+              d="M23.8,-53C25.9,-39.9,19.3,-23.6,27.8,-14.3C36.3,-4.9,59.9,-2.4,70.4,6C80.9,14.5,78.2,29.1,67.3,34.3C56.4,39.6,37.3,35.5,24.7,30.2C12.1,24.8,6.1,18.2,-3.7,24.6C-13.4,30.9,-26.8,50.2,-33.2,52C-39.6,53.8,-39,38,-45.7,26.4C-52.5,14.8,-66.5,7.4,-73.6,-4.1C-80.7,-15.6,-80.8,-31.2,-70,-35.6C-59.1,-40.1,-37.3,-33.4,-23.8,-39.9C-10.3,-46.4,-5.1,-66.2,2.8,-71.1C10.8,-76,21.6,-66.1,23.8,-53Z"
+              transform="translate(80 90)"
+            />
+          </svg>
+        </Container>
+      </Stack>
+
+      <svg
+        width="100%"
+        height="100%"
+        id="svg"
+        viewBox="0 0 1440 490"
+        xmlns="http://www.w3.org/2000/svg"
+        className="transition duration-300 ease-in-out delay-150"
+      >
+        <defs>
+          <linearGradient id="gradient" x1="41%" y1="1%" x2="59%" y2="99%">
+            <stop offset="5%" stop-color="#a75af7"></stop>
+            <stop offset="95%" stop-color="#f24861"></stop>
+          </linearGradient>
+        </defs>
+        <path
+          d="M 0,500 L 0,125 C 73.10133974579182,97.58467880453452 146.20267949158364,70.16935760906904 205,77 C 263.79732050841636,83.83064239093096 308.2906217794572,124.90724836825834 387,136 C 465.7093782205428,147.09275163174166 578.6348333905875,128.20164891789761 648,115 C 717.3651666094125,101.79835108210237 743.1700446581931,94.28615596015115 792,112 C 840.8299553418069,129.71384403984885 912.6849879766405,172.65372724149776 990,186 C 1067.3150120233595,199.34627275850224 1150.0900034352455,183.09893507385777 1226,168 C 1301.9099965647545,152.90106492614223 1370.9549982823773,138.9505324630711 1440,125 L 1440,500 L 0,500 Z"
+          stroke="none"
+          stroke-width="0"
+          fill="url(#gradient)"
+          fill-opacity="0.53"
+          className="transition-all duration-300 ease-in-out delay-150 path-0"
+        ></path>
+        <defs>
+          <linearGradient id="gradient" x1="41%" y1="1%" x2="59%" y2="99%">
+            <stop offset="5%" stop-color="#a75af7"></stop>
+            <stop offset="95%" stop-color="#f24861"></stop>
+          </linearGradient>
+        </defs>
+        <path
+          d="M 0,500 L 0,291 C 60.68223978014427,265.45757471659226 121.36447956028854,239.91514943318447 199,252 C 276.63552043971146,264.08485056681553 371.22432153899,313.79697698385434 442,318 C 512.77567846101,322.20302301614566 559.7382342837512,280.89694263139813 619,271 C 678.2617657162488,261.10305736860187 749.8227413260048,282.6152524905531 827,284 C 904.1772586739952,285.3847475094469 986.9708004122292,266.64204740638957 1049,266 C 1111.0291995877708,265.35795259361043 1152.2940570250773,282.81655788388866 1214,290 C 1275.7059429749227,297.18344211611134 1357.8529714874612,294.09172105805567 1440,291 L 1440,500 L 0,500 Z"
+          stroke="none"
+          stroke-width="0"
+          fill="url(#gradient)"
+          fill-opacity="1"
+          className="transition-all duration-300 ease-in-out delay-150 path-1"
+        ></path>
+      </svg>
+
+      <Stack
+        direction="row"
+        alignItems="center"
+        maxH="50vh"
+        height="50vh"
+        maxW="100vw"
+        ml={0}
+        bg="#f24861"
+        justifyContent="center"
+      >
+        <div className="w-1/2 ml-20">
+          <h1 className="text-4xl text-white">Why ChainFusion?</h1>
         </div>
-        <div>
-          <button onClick={getAccounts} className="card">
-            Get Accounts
-          </button>
+        <div className=" w-1/2">
+          <Box p={4} bg="white" borderRadius="lg" mr="20">
+            <Text fontSize="lg">
+              ChainFusion represents a revolutionary approach to blockchain
+              integration, seamlessly blending the power of distributed ledger
+              technology with the agility of AI-driven systems. As a
+              cutting-edge platform, ChainFusion stands as a beacon of
+              innovation in the ever-evolving landscape of digital transactions
+              and data security. By fusing blockchains immutable ledger with AIs
+              dynamic capabilities, ChainFusion offers unparalleled resilience
+              against emerging threats in the digital realm. It serves as a
+              cornerstone in the architecture of modern digital infrastructure,
+              providing a robust foundation for decentralized applications and
+              secure transactions. ChainFusions visionary design transcends
+              traditional boundaries, ushering in a new era of trust,
+              transparency, and efficiency in the global economy. With its
+              unique blend of technology and vision, ChainFusion is poised to
+              redefine the way we interact with digital assets and shape the
+              future of decentralized ecosystems.
+            </Text>
+          </Box>
         </div>
-        <div>
-          <button onClick={getBalance} className="card">
-            Get Balance
-          </button>
+      </Stack>
+
+      <Stack
+        direction="row"
+        alignItems="center"
+        maxH="50vh"
+        height="50vh"
+        maxW="100vw"
+        ml={0}
+        bg="#f24861"
+        justifyContent="space-between"
+        spacing="20%"
+      >
+        <div className=" w-1/2">
+          <Box p={4} bg="white" borderRadius="lg" ml="20">
+            <Text fontSize="lg">
+              Embarking on the onboarding journey with our app, powered by
+              Web3Auth, is a transformative experience where cutting-edge
+              security converges with unparalleled customization and
+              user-centricity. Through the innovative Multi-Party Computation
+              (MPC) technology, our app ensures robust account security without
+              the burden of traditional KYC or AML requirements, safeguarding
+              against single points of failure with enterprise-grade key
+              management methods. Users retain full control over their accounts,
+              establishing non-custodial security factors and seamlessly
+              transitioning across applications with ease. The fusion of hot
+              wallet convenience and cold wallet security, made possible by
+              Web3Auth's MPC foundation, delivers a seamless user experience
+              unparalleled in its adaptability and accessibility. With Web3Auth,
+              our app offers a gateway to a realm of digital ownership and
+              identity where simplicity and familiarity reign supreme. From
+              preserving brand integrity to simplifying onboarding for NFT
+              creators and enthusiasts, our app leverages Web3Auth's seamless
+              integration to empower users and businesses alike. By harnessing
+              the power of Web3Auth, our app is committed to fostering a future
+              where digital ownership is accessible to all, revolutionizing the
+              way we interact with and secure our digital assets.
+            </Text>
+          </Box>
         </div>
-        <div>
-          <button onClick={increment} className="card">
-            Increment
-          </button>
+        <div className="w-1/2 mr-20">
+          <h1 className="text-4xl text-white">
+            What is the Onboaring Process?
+          </h1>
         </div>
-        <div>
-          <button onClick={decrement} className="card">
-            Decrement
-          </button>
+      </Stack>
+
+      <Stack
+        direction="row"
+        alignItems="center"
+        maxH="50vh"
+        height="50vh"
+        maxW="100vw"
+        ml={0}
+        bg="#f24861"
+        justifyContent="center"
+      >
+        <div className="w-1/2 ml-20">
+          <h1 className="text-4xl text-white">How Are We Secured?</h1>
         </div>
-        <div>
-          <button onClick={tripleIncrement} className="card">
-            Increment x 3
-          </button>
+        <div className=" w-1/2">
+          <Box p={4} bg="white" borderRadius="lg" mr="20">
+            <Text fontSize="lg">
+              Experience the pinnacle of in-house security solutions with our
+              app, where seamless integration meets advanced identity
+              verification. With Decentralized ID, users gain access to
+              lightning-fast ID verification bolstered by cutting-edge
+              cryptography, ensuring the transformation of verified ID data into
+              resilient Digital ID credentials. Our in-house security solution
+              enables swift onboarding across trusted relationships, slashing
+              verification costs and minimizing drop-offs while empowering
+              individuals to seamlessly transition into new opportunities. We
+              expedite the launch of our digital identity ecosystem, seamlessly
+              integrating secure, reusable Digital Identity credentials without
+              the need for extensive infrastructure. Committed to privacy and
+              transparency, Dock undergoes regular third-party security audits
+              and adheres to GDPR compliance standards, guaranteeing users full
+              control over their personal data. Join us in revolutionizing
+              in-house security solutions, where efficiency, reliability, and
+              global adoption converge to redefine the future of identity
+              verification.
+            </Text>
+          </Box>
         </div>
-        <div>
-          <button onClick={tripleDecrement} className="card">
-            Decrement x 3
-          </button>
-        </div>
-        <div>
-          <button onClick={signMessage} className="card">
-            Sign Message
-          </button>
-        </div>
-        <div>
-          <button onClick={logout} className="card">
-            Log Out
-          </button>
-        </div>
-      </div>
+      </Stack>
     </>
   );
+};
 
-  const unloggedInView = (
-    <button onClick={login} className="card">
-      Login
-    </button>
-  );
-
-  return (
-    <div className="container">
-      <h1 className="title">
-        <a target="_blank" href="https://web3auth.io/docs/sdk/pnp/web/modal" rel="noreferrer">
-          Web3Auth{" "}
-        </a>
-        & NextJS Quick Start
-      </h1>
-
-      <div className="grid">{loggedIn ? loggedInView : unloggedInView}</div>
-      <div id="console" style={{ whiteSpace: "pre-line" }}>
-        <p style={{ whiteSpace: "pre-line" }}></p>
-      </div>
-
-      <footer className="footer">
-        <a
-          href="https://github.com/Web3Auth/web3auth-pnp-examples/tree/main/web-modal-sdk/quick-starts/nextjs-modal-quick-start"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Source code
-        </a>
-      </footer>
-    </div>
-  );
-}
-
-export default App;
+export default page;
