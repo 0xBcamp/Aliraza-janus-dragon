@@ -35,7 +35,7 @@ const page = () => {
           <p className="text-white mt-8 text-lg">
             Welcome to ChainFusion, your hub for identity management and
             decentralized finance. Explore a world of security, transparency,
-            and financial freedom.
+            and financial freedom. Powered by Moon.
           </p>
         </Card>
 
