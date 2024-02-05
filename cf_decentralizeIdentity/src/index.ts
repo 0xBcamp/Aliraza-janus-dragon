@@ -21,13 +21,40 @@ const main = async () => {
   );
   console.log(`Issuer DID: ${issuer_did}`);
   console.log(`Holder DID: ${holder_did}`);
-  // await di.issueCredential(universityCredential, issuer_did, holder_did);
-  // console.log(`Holder Decentralize Identifier: ${holder_did}`);
-  // const holder_address: string = "0x672BeB69B7129762fB2847bdA5f73E75029c9349";
-  // await decentralizedIdentity.storeDID(issuer_did, wallet.address);
-  // setTimeout(async () => {
-  //   const isDidVerified: boolean | undefined = await di.verifyDID(issuer_did, wallet_address);
-  //   console.log(`\n${issuer_did} verified: ${String(isDidVerified).toUpperCase()}`);
-  // }, 1000);
+
+  await di.storeDID(issuer_did, wallet_address);
+
+  setTimeout(async () => {
+    const isDidVerified: boolean | undefined = await di.verifyDID(
+      issuer_did,
+      wallet_address
+    );
+    console.log(
+      `\n${issuer_did} verified: ${String(isDidVerified).toUpperCase()}`
+    );
+  }, 1000);
+
+  const cid: string = await di.issueCredential(
+    universityCredential,
+    issuer_did,
+    holder_did
+  );
+
+  setTimeout(async () => {
+    const isCredentialVerified: boolean = await di.verifyCredential(
+      issuer_did,
+      holder_did,
+      cid
+    );
+    console.log(
+      `\n${cid} verified: ${String(isCredentialVerified).toUpperCase()}`
+    );
+  }, 1000);
+
+  const credentials_holder: string[] = await di.getCredentials(holder_did);
+  const credentials_issuer: string[] = await di.getCredentials(holder_did);
+  console.log(
+    `\nCredentials of ${holder_did}:\n${credentials_holder}\n\nCredentials of ${issuer_did}:\n${credentials_issuer}`
+  );
 };
 main();

@@ -41,7 +41,12 @@ export class DecentralizeIdentity {
   storeDID = async (did: string, address: string) => {
     try {
       console.log(`Storing DID {${did}} on address {${address}}...`);
-      await this.contract.assignDID(address, did);
+      const didExists: boolean = (
+        await this.contract.getDIDs(address)
+      ).includes(did);
+      !didExists
+        ? await this.contract.assignDID(address, did)
+        : new Error("DID already exists");
       console.log(`ONCHAIN => Identity assigned successfully.`);
     } catch (error) {
       console.log(error);
@@ -49,7 +54,7 @@ export class DecentralizeIdentity {
   };
 
   /**
-   * @notice This function do double verification of the did on both OnChain and OffChain.
+   * @notice This function do double verification of the did, both OnChain and OffChain.
    * @param did decentralize identifier of the user to verify
    * @param address public key/wallet address
    * @returns verification check (TRUE or FALSE)
@@ -71,17 +76,44 @@ export class DecentralizeIdentity {
   };
 
   issueCredential = async (
-    credential: string,
     issuer_did: string,
-    holder_did: string
+    holder_did: string,
+    credential: string
   ): Promise<string> => {
     // get credential hash
     const ipfs_cid: string = await storage.upload(credential);
     const cid: string = ipfs_cid.split("/")[2];
-    // await this.contract.issueCredentials(updated_credential);
+    await this.contract.issueCredentials(issuer_did, holder_did, cid);
     console.log(`Issued Credential: CID => ${cid}`);
     return cid;
   };
 
-  verifyCredential = async () => {};
+  /**
+   *
+   * @param credential ipfs hash of the credential to verify
+   * @param issuer_did identifier of the issuer of credential
+   * @param holder_did identifier of the holder of credential
+   */
+  verifyCredential = async (
+    issuer_did: string,
+    holder_did: string,
+    credential: string
+  ): Promise<boolean> => {
+    const issuer_credentials: string[] =
+      await this.contract.getIssuedCredentials(issuer_did);
+    const holder_credentials: string[] =
+      await this.contract.getHoldedCredentials(holder_did);
+    return (
+      issuer_credentials.includes(credential) &&
+      holder_credentials.includes(credential)
+    );
+  };
+
+  getCredentials = async (did: string): Promise<string[]> => {
+    const holded_credentials: string[] =
+      await this.contract.getHoldedCredentials(did);
+    const issuer_credentials: string[] =
+      await this.contract.getIssuedCredentials(did);
+    return [...holded_credentials, ...issuer_credentials];
+  };
 }

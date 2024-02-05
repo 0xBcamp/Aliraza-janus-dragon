@@ -1,2 +1,101 @@
-export const contract_address: string = "0xA91F43471a7D14Ae10cFB432faC3CDD5022ad537";
-export const contract_abi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"internalType":"uint256","name":"_dids","type":"uint256"}],"name":"MAX_DIDs_Created","type":"error"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"string","name":"holder_did","type":"string"},{"indexed":false,"internalType":"bytes32","name":"credential","type":"bytes32"}],"name":"CredentialIssued","type":"event"},{"inputs":[{"internalType":"address","name":"_user","type":"address"},{"internalType":"string","name":"_did","type":"string"}],"name":"assignDID","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"did","type":"string"}],"name":"getCredentials","outputs":[{"internalType":"bytes32[]","name":"credentials","type":"bytes32[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_user","type":"address"}],"name":"getDIDs","outputs":[{"internalType":"string[]","name":"","type":"string[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"did","type":"string"},{"internalType":"bytes32","name":"credential","type":"bytes32"}],"name":"issueCredentials","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"maxDIDs","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"pure","type":"function"}]
+export const contract_address: string =
+  "0x03FF7263BeF2B8C8b9dF078c5D28629757C790EC";
+export const contract_abi = [
+  { inputs: [], stateMutability: "nonpayable", type: "constructor" },
+  {
+    inputs: [{ internalType: "uint256", name: "_dids", type: "uint256" }],
+    name: "MAX_DIDs_Created",
+    type: "error",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "string", name: "issuer", type: "string" },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "credential",
+        type: "string",
+      },
+      { indexed: true, internalType: "string", name: "holder", type: "string" },
+    ],
+    name: "CredentialIssued",
+    type: "event",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "_user", type: "address" },
+      { internalType: "string", name: "_did", type: "string" },
+    ],
+    name: "assignDID",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "string", name: "did", type: "string" }],
+    name: "getDIDStatus",
+    outputs: [
+      {
+        internalType: "enum DecentralizeIdentity.DIDStatus",
+        name: "",
+        type: "uint8",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "_user", type: "address" }],
+    name: "getDIDs",
+    outputs: [{ internalType: "string[]", name: "", type: "string[]" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "string", name: "did", type: "string" }],
+    name: "getHoldedCredentials",
+    outputs: [
+      { internalType: "string[]", name: "credentials", type: "string[]" },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "string", name: "did", type: "string" }],
+    name: "getIssuedCredentials",
+    outputs: [
+      { internalType: "string[]", name: "credentials", type: "string[]" },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "string", name: "issuer_did", type: "string" },
+      { internalType: "string", name: "holder_did", type: "string" },
+      { internalType: "string", name: "credential", type: "string" },
+    ],
+    name: "issueCredentials",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "maxDIDs",
+    outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
+    stateMutability: "pure",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "_user", type: "address" },
+      { internalType: "string", name: "_did", type: "string" },
+    ],
+    name: "removeDID",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+];
