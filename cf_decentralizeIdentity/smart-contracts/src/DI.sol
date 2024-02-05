@@ -12,11 +12,12 @@ contract DecentralizeIdentity {
 
     uint8 private constant MAX_DIDs = 10;
 
-    mapping(string did => bytes32[] credentials) private didToCredentials;
+    mapping(string holder_did => string[] credentials) private didToIssuedCredentials;
+    mapping(string issuer_did => string[] credentials) private didToHoldedCredentials;
     mapping(address => string[]) private addressToDIDs;
     mapping(string => DIDStatus) private didToStatus;
     
-    event CredentialIssued(string holder_did, bytes32 credential);
+    event CredentialIssued(string indexed issuer, string credential, string indexed holder);
 
     constructor() {}
 
@@ -38,21 +39,32 @@ contract DecentralizeIdentity {
 
     /**
     @dev assigns a credential to a decentralize identifier
-    @param did the decentralize identifier to assign a credential to
+    @param issuer_did the decentralize identifier of the issuer
+    @param holder_did the decentralize identifier to assign a credential to
     @param credential the credential to assign, contains the attestation info with the did of the issuer.
     */
-    function issueCredentials(string memory did, bytes32 credential) external {
-        didToCredentials[did].push(credential);
-        emit CredentialIssued(did, credential);
+    function issueCredentials(string memory issuer_did, string memory holder_did, string memory credential) external {
+        didToIssuedCredentials[issuer_did].push(credential);        
+        didToHoldedCredentials[holder_did].push(credential);
+        emit CredentialIssued(issuer_did, credential, holder_did);
     }
 
     /**
-    Returns all credentials of the holder
+    Returns all issued credentials 
     */
-    function getCredentials(
+    function getIssuedCredentials(
         string memory did
-    ) external view returns (bytes32[] memory credentials) {
-        return didToCredentials[did];
+    ) external view returns (string[] memory credentials) {
+        return didToIssuedCredentials[did];
+    }
+
+    /**
+    Returns all holded credentials
+    */
+    function getHoldedCredentials(
+        string memory did
+    ) external view returns (string[] memory credentials) {
+        return didToHoldedCredentials[did];
     }
 
     function getDIDs(address _user) external view returns (string[] memory) {
