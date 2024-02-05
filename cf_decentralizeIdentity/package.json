@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@thirdweb-dev/storage": "^2.0.9",
     "@types/express": "^4.17.21",
     "dotenv": "^16.4.1",
     "ethers": "^6.10.0",
