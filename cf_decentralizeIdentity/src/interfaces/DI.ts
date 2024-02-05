@@ -1,23 +1,16 @@
 import { createHash } from "crypto";
 import { BaseContract, HDNodeWallet } from "ethers";
 import { DecentralizeIdentityContractInit, DIContractInterface } from "./Contract";
-import { createHelia } from 'helia';
-import { unixfs } from '@helia/unixfs'
-import { json } from '@helia/json'
-import { JSON } from '@helia/json'
+import { ThirdwebStorage } from "@thirdweb-dev/storage";
 
 export class DecentralizeIdentity {
     contract_init: DecentralizeIdentityContractInit;
     contract: DIContractInterface;
-    helia_json:JSON | undefined;
 
     constructor() {
         this.contract_init = new DecentralizeIdentityContractInit();
         this.contract = this.contract_init.getContract();
         const _helia_init = async () => {
-            const helia = await createHelia();
-            // const fs = unixfs(helia);
-            this.helia_json = json(helia);
         }
         _helia_init();
     }
@@ -70,9 +63,8 @@ export class DecentralizeIdentity {
   
     issueCredential = async (credential: any,issuer_did: string, holder_did: string) => {
       // get credential hash
-      const cid = await this.helia_json!.add(credential);
-      console.log(`Issued Credential: CID => ${cid}`);
-      return cid;
+      // console.log(`Issued Credential: CID => ${cid}`);
+      // return cid;
     }
   
     verifyCredential = async () => {}

@@ -1,5 +1,7 @@
 import { BaseContract, Contract, HDNodeWallet, JsonRpcProvider, Wallet, ethers } from "ethers";
 import { contract_abi, contract_address } from "../contract";
+import dotenv from 'dotenv';
+dotenv.config();
 
 enum DIDStatus{
     ACTIVE,

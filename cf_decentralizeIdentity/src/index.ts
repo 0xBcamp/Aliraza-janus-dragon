@@ -20,16 +20,16 @@ const main = async () => {
   const di: DecentralizeIdentity = new DecentralizeIdentity();
   const wallet_address: string = di.contract_init.getWallet().address;
   console.log(`User: ${wallet_address}`);
-  const issuer_did: string = di.createIdentifier(
-    "university",
-    wallet_address
-  );
-  const holder_did: string = di.createIdentifier(
-    "education",
-    "0x672BeB69B7129762fB2847bdA5f73E75029c9349"
-    );
-  console.log(`Generated Local Identifier: ${issuer_did}`);
-  di.issueCredential(universityCredential, issuer_did, holder_did);
+  // const issuer_did: string = di.createIdentifier(
+  //   "university",
+  //   wallet_address
+  // );
+  // const holder_did: string = di.createIdentifier(
+  //   "education",
+  //   "0x672BeB69B7129762fB2847bdA5f73E75029c9349"
+  //   );
+  // console.log(`Generated Local Identifier: ${issuer_did}`);
+  // di.issueCredential(universityCredential, issuer_did, holder_did);
   // console.log(`Holder Decentralize Identifier: ${holder_did}`);
   // const holder_address: string = "0x672BeB69B7129762fB2847bdA5f73E75029c9349";
   // await decentralizedIdentity.storeDID(issuer_did, wallet.address);
