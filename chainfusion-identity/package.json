@@ -1,0 +1,33 @@
+{
+  "name": "chainfusion-identity",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "start:dev": "npx nodemon"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@thirdweb-dev/storage": "^2.0.9",
+    "@types/express": "^4.17.21",
+    "dotenv": "^16.4.1",
+    "ethers": "^6.10.0",
+    "express": "^4.18.2",
+    "install": "^0.13.0"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@typechain/ethers-v6": "^0.5.1",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.7",
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.3",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typechain": "^8.3.2",
+    "typescript": "^5.3.3"
+  }
+}
