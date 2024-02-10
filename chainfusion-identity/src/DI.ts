@@ -17,22 +17,24 @@ import {
   test_contract_abi,
   test_contract_address,
 } from "./contract";
+import assert from "assert";
+import { Credential } from "./types/types";
 dotenv.config();
 
-const storage = new ThirdwebStorage({
-  secretKey: process.env.IPFS_STORAGE_KEY,
-});
-
 export class DecentralizeIdentity {
-  contract: DIContractInterface;
+  private contract: DIContractInterface;
+  storage: ThirdwebStorage;
 
-  constructor(signer: JsonRpcSigner | Signer) {
+  constructor(signer: JsonRpcSigner | Signer, storage_secret_key: string) {
     const _contract: Contract = new ethers.Contract(
-      test_contract_address,
-      test_contract_abi,
+      contract_address,
+      contract_abi,
       signer.provider
     );
     this.contract = _contract.connect(signer) as DIContractInterface;
+    this.storage = new ThirdwebStorage({
+      secretKey: storage_secret_key,
+    });
   }
 
   /**
@@ -54,10 +56,8 @@ export class DecentralizeIdentity {
    */
   storeDID = async (did: string, address: string) => {
     try {
-      const didExists: boolean = (
-        await this.contract.getDIDs(address)
-      ).includes(did);
-      if (didExists) {
+      const isValidDid: boolean = await this.verifyDID(did, address);
+      if (isValidDid) {
         throw new Error("DID already exists");
       } else {
         await this.contract.assignDID(address, did);
@@ -73,12 +73,13 @@ export class DecentralizeIdentity {
    * @param address public key/wallet address
    * @returns verification check (TRUE or FALSE)
    */
-  verifyDID = async (
-    did: string,
-    address: string
-  ): Promise<boolean | undefined> => {
+  verifyDID = async (did: string, address: string): Promise<boolean> => {
     try {
-      console.log("Verifying Identity...");
+      const cid_hash: string = did.split(":")[2];
+      assert(
+        /^did:.+:[a-z0-9]+$/.test(did) && cid_hash.length === 64,
+        "Invalid DID"
+      );
       const user_dids: string[] = await this.contract.getDIDs(address);
       const isDidOnChainVerified: boolean = user_dids.includes(did);
       const name: string = did.split(":")[1];
@@ -86,25 +87,51 @@ export class DecentralizeIdentity {
       return did === expected_did && isDidOnChainVerified;
     } catch (error) {
       console.log(error);
+      return false;
     }
   };
 
-  issueCredential = async (
-    issuer_did: string,
-    holder_did: string,
-    credential: string
-  ): Promise<string> => {
-    // get credential hash
-    const ipfs_cid: string = await storage.upload(credential);
-    const cid: string = ipfs_cid.split("/")[2];
-    await this.contract.issueCredentials(issuer_did, holder_did, cid);
-    console.log(`Issued Credential: CID => ${cid}`);
-    return cid;
+  issueCredential = async (data: Credential): Promise<string | undefined> => {
+    const {
+      credential,
+      holder_address,
+      holder_did,
+      issuer_address,
+      issuer_did,
+    } = data;
+    const isIssuerDidVerified: boolean = await this.verifyDID(
+      issuer_did,
+      issuer_address
+    );
+    const isHolderDidVerified: boolean = await this.verifyDID(
+      holder_did,
+      holder_address
+    );
+    if (!isIssuerDidVerified || !isHolderDidVerified) {
+      throw new Error("Invalid Issuer or Holder DID");
+    } else {
+      try {
+        const ipfs_cid: string = await this.storage.upload(credential);
+        const cid: string = ipfs_cid.split("/")[2];
+        // checking if the credentials have not been issued already
+        const credentials: string[] = await this.contract.getIssuedCredentials(
+          issuer_did
+        );
+        if (credentials.includes(cid)) {
+          throw new Error("Credentils issued already!");
+        } else {
+          await this.contract.issueCredentials(issuer_did, holder_did, cid);
+          return cid;
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
   };
 
   /**
    *
-   * @param credential ipfs hash of the credential to verify
+   * @param credential cid of the credential to verify
    * @param issuer_did identifier of the issuer of credential
    * @param holder_did identifier of the holder of credential
    */
@@ -125,23 +152,45 @@ export class DecentralizeIdentity {
 
   /**
    * @param did decentralize identifier of the user
-   * @returns all of the credentials assosiated of the user
+   * @returns all of the credentials issued by the user
    */
-  getCredentials = async (did: string): Promise<string[]> => {
-    const holded_credentials: string[] =
-      await this.contract.getHoldedCredentials(did);
+  getIssuedCredentials = async (did: string): Promise<string[]> => {
     const issuer_credentials: string[] =
       await this.contract.getIssuedCredentials(did);
-    return [...holded_credentials, ...issuer_credentials];
+    return issuer_credentials;
   };
 
   /**
-   * 
+   * @param did decentralize identifier of the user
+   * @returns all of the credentials, the user is holding
+   */
+  getHoldedCredentials = async (did: string): Promise<string[]> => {
+    const holded_credentials: string[] =
+      await this.contract.getHoldedCredentials(did);
+    return holded_credentials;
+  };
+
+  /**
+   *
    * @param address wallet address of the user
    * @returns the decentralize identifiers of the user
    */
-  getDIDs = async (address: string): Promise<string[]> => {
-    const dids: string[] = await this.contract.getDIDs(address);
-    return dids;
+  getDIDs = async (address: string): Promise<string[] | undefined> => {
+    try {
+      const dids = await this.contract.getDIDs(address);
+      return dids;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  getMaxDIDs = async (): Promise<number> => {
+    const max_dids: number = await this.contract.maxDIDs();
+    return max_dids;
+  };
+
+  getContractAddress = async (): Promise<string> => {
+    const address: string = await this.contract.getAddress();
+    return address;
   };
 }
