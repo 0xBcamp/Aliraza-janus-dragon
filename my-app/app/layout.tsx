@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import {
+  IdentityContextProvider,
+  WalletContextProvider,
+} from "@/providers/Providers";
+import { ConnectWallet } from "./components/ConnectWallet";
+import Navbar from "./components/Navbar";
 
 export default function RootLayout({
   children,
@@ -11,7 +17,14 @@ export default function RootLayout({
       <head>
         <title>ChainFusion</title>
       </head>
-      <body>{children}</body>
+      <body>
+        <WalletContextProvider>
+          <IdentityContextProvider>
+            <Navbar />
+            {children}
+          </IdentityContextProvider>
+        </WalletContextProvider>
+      </body>
     </html>
   );
 }
