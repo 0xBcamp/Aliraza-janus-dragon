@@ -1,14 +1,13 @@
-import dotenv from "dotenv";
 import { BaseContract } from "ethers";
-dotenv.config();
 
 enum DIDStatus {
   ACTIVE,
   EXPIRED,
 }
+
 export interface DIContractInterface extends BaseContract {
-  assignDID(user: string, did: string): Promise<void>;
-  removeDID(user: string, did: string): Promise<void>;
+  assignDID(did: string, options?: any): Promise<void>;
+  removeDID(did: string, options?: any): Promise<void>;
   issueCredentials(
     issuer_did: string,
     holder_did: string,
@@ -16,7 +15,7 @@ export interface DIContractInterface extends BaseContract {
   ): Promise<void>;
   getIssuedCredentials(did: string): Promise<string[]>;
   getHoldedCredentials(did: string): Promise<string[]>;
-  getDIDs(user: string): Promise<string[]>;
+  getDIDs(options?: any): Promise<string[]>;
   maxDIDs(): Promise<number>;
   getDIDStatus(did: string): Promise<DIDStatus>;
 }

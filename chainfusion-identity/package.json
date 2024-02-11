@@ -1,14 +1,24 @@
 {
   "name": "chainfusion-identity",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A package from ChainFusion to manage your identities in a decentralized way.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "repository": {
+    "url": "https://github.com/0xBcamp/Aliraza-janus-dragon.git"
+  },
   "scripts": {
     "test": "jest",
-    "start:dev": "npx nodemon"
+    "start:dev": "npx nodemon",
+    "build":"tsup src/index.ts --format cjs,esm --dts"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "decentralized identity",
+    "chainfusion",
+    "blockchain"
+  ],
+  "author": "Muhammad Masood",
   "license": "ISC",
   "dependencies": {
     "@thirdweb-dev/storage": "^2.0.9",
@@ -27,6 +37,7 @@
     "nodemon": "^3.0.3",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
+    "tsup": "^8.0.2",
     "typechain": "^8.3.2",
     "typescript": "^5.3.3"
   }

@@ -101,42 +101,21 @@ export const contract_abi = [
 ];
 
 export const test_contract_address: string =
-  "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+  "0x5fbdb2315678afecb367f032d93f642f64180aa3";
 
 export const test_contract_abi = [
-  {
-    type: "constructor",
-    inputs: [],
-    stateMutability: "nonpayable",
-  },
+  { type: "constructor", inputs: [], stateMutability: "nonpayable" },
   {
     type: "function",
     name: "assignDID",
-    inputs: [
-      {
-        name: "_user",
-        type: "address",
-        internalType: "address",
-      },
-      {
-        name: "_did",
-        type: "string",
-        internalType: "string",
-      },
-    ],
+    inputs: [{ name: "_did", type: "string", internalType: "string" }],
     outputs: [],
     stateMutability: "nonpayable",
   },
   {
     type: "function",
     name: "getDIDStatus",
-    inputs: [
-      {
-        name: "did",
-        type: "string",
-        internalType: "string",
-      },
-    ],
+    inputs: [{ name: "did", type: "string", internalType: "string" }],
     outputs: [
       {
         name: "",
@@ -149,57 +128,25 @@ export const test_contract_abi = [
   {
     type: "function",
     name: "getDIDs",
-    inputs: [
-      {
-        name: "_user",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-    outputs: [
-      {
-        name: "",
-        type: "string[]",
-        internalType: "string[]",
-      },
-    ],
+    inputs: [{ name: "_user", type: "address", internalType: "address" }],
+    outputs: [{ name: "", type: "string[]", internalType: "string[]" }],
     stateMutability: "view",
   },
   {
     type: "function",
     name: "getHoldedCredentials",
-    inputs: [
-      {
-        name: "did",
-        type: "string",
-        internalType: "string",
-      },
-    ],
+    inputs: [{ name: "did", type: "string", internalType: "string" }],
     outputs: [
-      {
-        name: "credentials",
-        type: "string[]",
-        internalType: "string[]",
-      },
+      { name: "credentials", type: "string[]", internalType: "string[]" },
     ],
     stateMutability: "view",
   },
   {
     type: "function",
     name: "getIssuedCredentials",
-    inputs: [
-      {
-        name: "did",
-        type: "string",
-        internalType: "string",
-      },
-    ],
+    inputs: [{ name: "did", type: "string", internalType: "string" }],
     outputs: [
-      {
-        name: "credentials",
-        type: "string[]",
-        internalType: "string[]",
-      },
+      { name: "credentials", type: "string[]", internalType: "string[]" },
     ],
     stateMutability: "view",
   },
@@ -207,21 +154,9 @@ export const test_contract_abi = [
     type: "function",
     name: "issueCredentials",
     inputs: [
-      {
-        name: "issuer_did",
-        type: "string",
-        internalType: "string",
-      },
-      {
-        name: "holder_did",
-        type: "string",
-        internalType: "string",
-      },
-      {
-        name: "credential",
-        type: "string",
-        internalType: "string",
-      },
+      { name: "issuer_did", type: "string", internalType: "string" },
+      { name: "holder_did", type: "string", internalType: "string" },
+      { name: "credential", type: "string", internalType: "string" },
     ],
     outputs: [],
     stateMutability: "nonpayable",
@@ -230,30 +165,13 @@ export const test_contract_abi = [
     type: "function",
     name: "maxDIDs",
     inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "uint8",
-        internalType: "uint8",
-      },
-    ],
+    outputs: [{ name: "", type: "uint8", internalType: "uint8" }],
     stateMutability: "pure",
   },
   {
     type: "function",
     name: "removeDID",
-    inputs: [
-      {
-        name: "_user",
-        type: "address",
-        internalType: "address",
-      },
-      {
-        name: "_did",
-        type: "string",
-        internalType: "string",
-      },
-    ],
+    inputs: [{ name: "_did", type: "string", internalType: "string" }],
     outputs: [],
     stateMutability: "nonpayable",
   },
@@ -261,36 +179,40 @@ export const test_contract_abi = [
     type: "event",
     name: "CredentialIssued",
     inputs: [
-      {
-        name: "issuer",
-        type: "string",
-        indexed: true,
-        internalType: "string",
-      },
+      { name: "issuer", type: "string", indexed: true, internalType: "string" },
       {
         name: "credential",
         type: "string",
         indexed: false,
         internalType: "string",
       },
-      {
-        name: "holder",
-        type: "string",
-        indexed: true,
-        internalType: "string",
-      },
+      { name: "holder", type: "string", indexed: true, internalType: "string" },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "DIDAssigned",
+    inputs: [
+      { name: "user", type: "address", indexed: true, internalType: "address" },
+      { name: "did", type: "string", indexed: true, internalType: "string" },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "DIDRemoved",
+    inputs: [
+      { name: "user", type: "address", indexed: true, internalType: "address" },
+      { name: "did", type: "string", indexed: true, internalType: "string" },
     ],
     anonymous: false,
   },
   {
     type: "error",
     name: "MAX_DIDs_Created",
-    inputs: [
-      {
-        name: "_dids",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
+    inputs: [{ name: "_dids", type: "uint256", internalType: "uint256" }],
   },
+  { type: "error", name: "UNDEFINED_OR_EXPIRED_DID", inputs: [] },
+  { type: "error", name: "Unauthorized", inputs: [] },
 ];

@@ -50,7 +50,7 @@ export class DecentralizeIdentity {
   };
 
   /**
-   * @dev This function stores the DID in the wallet of the user on the blockchain
+   * @dev This function stores the DID in the wallet of the user on the blockchain. This is necessary for verifying credentials.
    * @param did decentralize identifier
    * @param address wallet address of user
    */
@@ -60,12 +60,20 @@ export class DecentralizeIdentity {
       if (isValidDid) {
         throw new Error("DID already exists");
       } else {
-        await this.contract.assignDID(address, did);
+        await this.contract.assignDID(did, { from: address });
       }
     } catch (error) {
       console.log(error);
     }
   };
+
+  removeDID = async (did: string, address: string) => {
+    try{
+      this.contract.removeDID(did, {from:address});
+    } catch(error){
+      console.log(error);
+    }
+  }
 
   /**
    * @notice This function do double verification of the did, both OnChain and OffChain.
@@ -80,7 +88,7 @@ export class DecentralizeIdentity {
         /^did:.+:[a-z0-9]+$/.test(did) && cid_hash.length === 64,
         "Invalid DID"
       );
-      const user_dids: string[] = await this.contract.getDIDs(address);
+      const user_dids: string[] = await this.contract.getDIDs({from:address});
       const isDidOnChainVerified: boolean = user_dids.includes(did);
       const name: string = did.split(":")[1];
       const expected_did: string = this.createIdentifier(name, address);
@@ -177,7 +185,7 @@ export class DecentralizeIdentity {
    */
   getDIDs = async (address: string): Promise<string[] | undefined> => {
     try {
-      const dids = await this.contract.getDIDs(address);
+      const dids = await this.contract.getDIDs({from:address});
       return dids;
     } catch (error) {
       console.log(error);
