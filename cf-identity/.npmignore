@@ -1,5 +1,4 @@
 src/test
-src/contract.ts
 jest.config.js
 tsconfig.json
 nodemon.json
