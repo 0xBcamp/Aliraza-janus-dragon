@@ -1,5 +1,5 @@
 export const contract_address: string =
-  "0x03FF7263BeF2B8C8b9dF078c5D28629757C790EC";
+  "0x954d92B7AA9Ba1c1Ed288669d80f2D55a297eE33";
 export const contract_abi = [
   { inputs: [], stateMutability: "nonpayable", type: "constructor" },
   {
@@ -7,6 +7,8 @@ export const contract_abi = [
     name: "MAX_DIDs_Created",
     type: "error",
   },
+  { inputs: [], name: "UNDEFINED_OR_EXPIRED_DID", type: "error" },
+  { inputs: [], name: "Unauthorized", type: "error" },
   {
     anonymous: false,
     inputs: [
@@ -23,10 +25,25 @@ export const contract_abi = [
     type: "event",
   },
   {
+    anonymous: false,
     inputs: [
-      { internalType: "address", name: "_user", type: "address" },
-      { internalType: "string", name: "_did", type: "string" },
+      { indexed: true, internalType: "address", name: "user", type: "address" },
+      { indexed: true, internalType: "string", name: "did", type: "string" },
     ],
+    name: "DIDAssigned",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "address", name: "user", type: "address" },
+      { indexed: true, internalType: "string", name: "did", type: "string" },
+    ],
+    name: "DIDRemoved",
+    type: "event",
+  },
+  {
+    inputs: [{ internalType: "string", name: "_did", type: "string" }],
     name: "assignDID",
     outputs: [],
     stateMutability: "nonpayable",
@@ -46,7 +63,7 @@ export const contract_abi = [
     type: "function",
   },
   {
-    inputs: [{ internalType: "address", name: "_user", type: "address" }],
+    inputs: [],
     name: "getDIDs",
     outputs: [{ internalType: "string[]", name: "", type: "string[]" }],
     stateMutability: "view",
@@ -89,10 +106,7 @@ export const contract_abi = [
     type: "function",
   },
   {
-    inputs: [
-      { internalType: "address", name: "_user", type: "address" },
-      { internalType: "string", name: "_did", type: "string" },
-    ],
+    inputs: [{ internalType: "string", name: "_did", type: "string" }],
     name: "removeDID",
     outputs: [],
     stateMutability: "nonpayable",
