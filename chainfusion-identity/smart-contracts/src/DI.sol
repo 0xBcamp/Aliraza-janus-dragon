@@ -4,36 +4,48 @@ import {console} from "forge-std/Script.sol";
 
 contract DecentralizeIdentity {
     error MAX_DIDs_Created(uint256 _dids);
+    error Unauthorized();
+    error UNDEFINED_OR_EXPIRED_DID();
 
     enum DIDStatus {
+        UNDEFINED,
         ACTIVE,
         EXPIRED
     }
 
     uint8 private constant MAX_DIDs = 10;
 
-    mapping(string holder_did => string[] credentials) private didToIssuedCredentials;
-    mapping(string issuer_did => string[] credentials) private didToHoldedCredentials;
+    mapping(string holder_did => string[] credentials)
+        private didToIssuedCredentials;
+    mapping(string issuer_did => string[] credentials)
+        private didToHoldedCredentials;
     mapping(address => string[]) private addressToDIDs;
     mapping(string => DIDStatus) private didToStatus;
-    
-    event CredentialIssued(string indexed issuer, string credential, string indexed holder);
+
+    event CredentialIssued(
+        string indexed issuer,
+        string credential,
+        string indexed holder
+    );
+    event DIDAssigned(address indexed user, string indexed did);
 
     constructor() {}
 
     /**
     @dev stores decentralize identifier in the wallet of user
-    @param _user the address of the user
     @param _did the decentralize identifier to store
     */
-    function assignDID(address _user, string memory _did) external {
-        uint256 userDIDs = addressToDIDs[_user].length + 1;
+    function assignDID(string memory _did) external {
+        uint256 userDIDs = addressToDIDs[msg.sender].length + 1;
         if (userDIDs > MAX_DIDs) revert MAX_DIDs_Created(userDIDs);
-        addressToDIDs[_user].push(_did);
+        addressToDIDs[msg.sender].push(_did);
+        didToStatus[_did] = DIDStatus.ACTIVE;
+        emit DIDAssigned(msg.sender, _did);
     }
 
-    function removeDID(address _user, string memory _did) external {
-        addressToDIDs[_user].length - 1;
+    function removeDID(string memory _did) external {
+        if (didToStatus[_did] != DIDStatus.ACTIVE) revert UNDEFINED_OR_EXPIRED_DID();
+        addressToDIDs[msg.sender].length - 1;
         didToStatus[_did] = DIDStatus.EXPIRED;
     }
 
@@ -43,8 +55,12 @@ contract DecentralizeIdentity {
     @param holder_did the decentralize identifier to assign a credential to
     @param credential the credential to assign, contains the attestation info with the did of the issuer.
     */
-    function issueCredentials(string memory issuer_did, string memory holder_did, string memory credential) external {
-        didToIssuedCredentials[issuer_did].push(credential);        
+    function issueCredentials(
+        string memory issuer_did,
+        string memory holder_did,
+        string memory credential
+    ) external {
+        didToIssuedCredentials[issuer_did].push(credential);
         didToHoldedCredentials[holder_did].push(credential);
         emit CredentialIssued(issuer_did, credential, holder_did);
     }
@@ -75,7 +91,7 @@ contract DecentralizeIdentity {
         return MAX_DIDs;
     }
 
-    function getDIDStatus(string memory did) external view returns (DIDStatus) {
+    function getDIDStatus(string memory did) public view returns (DIDStatus) {
         return didToStatus[did];
     }
 }

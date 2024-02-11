@@ -16,9 +16,10 @@ contract DITest is Test {
         "did:college:09fdd71c65e0dad736ac3fc201c49ecaf00b3840a544b5150c8aad68c58919aa";
     string public holder_did =
         "did:education:09fdd71c65e0dad736ac3fc201c49ecaf00b3840a544b5150c8aad68c58919aa";
-    bytes32 public credential_hash = bytes32("credential_123");
+    string public credential_hash = "QxHaSHasd434DXvdbvdghgsSHgSsjKSz";
 
     error MAX_DIDs_Created(uint256 _dids);
+    error UNDEFINED_OR_EXPIRED_DID();
 
     function setUp() public {
         diDeployScript = new DIDeployScript();
@@ -26,29 +27,49 @@ contract DITest is Test {
     }
 
     function test_ShouldAssignDidToUser() public {
-        di.assignDID(msg.sender, issuer_did);
-        string[] memory userDids = di.getDIDs(msg.sender);
+        vm.startPrank(issuer);
+        di.assignDID(issuer_did);
+        string[] memory userDids = di.getDIDs(issuer);
         string memory expectedUserDid = userDids[0];
-        uint256 currentUserDidsLength = di.getDIDs(msg.sender).length;
+        uint256 currentUserDidsLength = di.getDIDs(issuer).length;
         assertEq(currentUserDidsLength, 1);
         assertEq(expectedUserDid, issuer_did);
+        vm.stopPrank();
     }
 
     function test_ShouldRevertOnMaxDIDs() public {
         for (uint8 i = 0; i < 10; i++) {
-            di.assignDID(msg.sender, issuer_did);
+            vm.prank(issuer);
+            di.assignDID(issuer_did);
         }
-        uint256 user_dids = di.getDIDs(msg.sender).length + 1;
+        uint256 user_dids = di.getDIDs(issuer).length + 1;
         vm.expectRevert(
             abi.encodeWithSelector(MAX_DIDs_Created.selector, user_dids)
         );
-        di.assignDID(msg.sender, issuer_did);
+        vm.prank(issuer);
+        di.assignDID(issuer_did);
     }
 
     function test_ShouldIssueCredentialsToHolder() public {
-        di.issueCredentials(holder_did, credential_hash);
-        bytes32[] memory credentials = di.getCredentials(holder_did);
-        assertEq(credentials.length, 1);
-        assertEq(credentials[0], credential_hash);
+        di.issueCredentials(issuer_did, holder_did, credential_hash);
+        string[] memory holder_credentials = di.getHoldedCredentials(
+            holder_did
+        );
+        string[] memory issuer_credentials = di.getHoldedCredentials(
+            holder_did
+        );
+        assertEq(holder_credentials.length, 1);
+        assertEq(holder_credentials[0], credential_hash);
+        assertEq(issuer_credentials.length, 1);
+        assertEq(issuer_credentials[0], credential_hash);
+    }
+
+    function test_ShouldRevertOnRemovingTheDIDWhichDoesNotExists() public {
+        vm.prank(issuer);
+        di.assignDID("did:test:XYZ");
+        string memory randomDID = "did:random:XYZ";
+        vm.prank(issuer);
+        vm.expectRevert(abi.encodeWithSelector(UNDEFINED_OR_EXPIRED_DID.selector));
+        di.removeDID(randomDID);
     }
 }
