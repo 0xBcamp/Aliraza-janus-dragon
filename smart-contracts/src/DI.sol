@@ -86,8 +86,8 @@ contract DecentralizeIdentity {
         return didToHoldedCredentials[did];
     }
 
-    function getDIDs(address _user) external view returns (string[] memory) {
-        return addressToDIDs[_user];
+    function getDIDs() external view returns (string[] memory) {
+        return addressToDIDs[msg.sender];
     }
 
     function maxDIDs() external pure returns (uint8) {

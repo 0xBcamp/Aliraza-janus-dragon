@@ -29,9 +29,9 @@ contract DITest is Test {
     function test_ShouldAssignDidToUser() public {
         vm.startPrank(issuer);
         di.assignDID(issuer_did);
-        string[] memory userDids = di.getDIDs(issuer);
+        string[] memory userDids = di.getDIDs();
         string memory expectedUserDid = userDids[0];
-        uint256 currentUserDidsLength = di.getDIDs(issuer).length;
+        uint256 currentUserDidsLength = di.getDIDs().length;
         assertEq(currentUserDidsLength, 1);
         assertEq(expectedUserDid, issuer_did);
         vm.stopPrank();
@@ -42,7 +42,8 @@ contract DITest is Test {
             vm.prank(issuer);
             di.assignDID(issuer_did);
         }
-        uint256 user_dids = di.getDIDs(issuer).length + 1;
+        vm.prank(issuer);
+        uint256 user_dids = di.getDIDs().length + 1;
         vm.expectRevert(
             abi.encodeWithSelector(MAX_DIDs_Created.selector, user_dids)
         );
