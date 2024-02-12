@@ -17,18 +17,21 @@ export function ConnectWallet() {
       try {
         const provider = new ethers.BrowserProvider((window as any).ethereum);
         const signer = await provider.getSigner();
-        toNumber((await provider.getNetwork()).chainId) !== 80001
-          ? alert("Connect to Mumbai Network")
-          : setWallet({
-              provider: provider,
-              signer: signer,
-              isConnected: true,
-            });
-        const decentralizedIdentity = new DecentralizeIdentity(
-          signer,
-          "0Wvz5s13JbRDMHxCaf-v-r-ivOpbwN-6SeUTaHBZ8ex6zRNdUeJU1aH9IYquhe3cQyCFcoulDGJl9IH8rnRLjw"
-        );
-        setIdentitySDK(decentralizedIdentity);
+        if (toNumber((await provider.getNetwork()).chainId) !== 80001) {
+          alert("Connect to Mumbai Network");
+        } else {
+          setWallet({
+            provider: provider,
+            signer: signer,
+            isConnected: true,
+          });
+          const decentralizedIdentity: DecentralizeIdentity =
+            new DecentralizeIdentity(
+              signer,
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDkwMzliYjAyZmVERTdGZjlhMTM2NDkzQzlFOTg5MmNjYjFEZDdEMGMiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY5NDM5ODc1OTExNCwibmFtZSI6ImdlbmVyYXRlX2NpZCJ9.qH_uhaxfejq21q7ZRzr03V1V7EwPxOm9QHBRSGXUxYs"
+            );
+          setIdentitySDK(decentralizedIdentity);
+        }
       } catch (error) {
         console.log(error);
       }
@@ -38,7 +41,7 @@ export function ConnectWallet() {
   return (
     <div>
       <Button onClick={handleConnect}>
-        {isConnected ? "Conneced" : "Connect Wallet"}
+        {isConnected ? "Connected" : "Connect Wallet"}
       </Button>
     </div>
   );

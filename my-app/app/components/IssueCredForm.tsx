@@ -26,9 +26,18 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { IdentityContext, WalletContext } from "@/providers/Providers";
 import { Credential } from "cf-identity";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Label } from "@/components/ui/label";
 
 const IssueCredForm = () => {
   const [issuerDIDs, setIssuerDIDs] = useState<string[]>([]);
+  const [didName, setDidName] = useState<string | undefined>(undefined);
+  const [did, setDid] = useState<string>("");
   const { identitySDK } = useContext(IdentityContext);
   const { wallet } = useContext(WalletContext);
   const { isConnected } = wallet;
@@ -43,16 +52,31 @@ const IssueCredForm = () => {
       console.log(issuer_dids);
     }
     if (isConnected) {
-      console.log("Wallet connected!");
-      // fetchDIDs();
-    } else {
-      console.log("Wallet not connected!");
+      fetchDIDs();
     }
   }, [wallet]);
+
+  const generateDid = async () => {
+    if (isConnected) {
+      try {
+        const did: string = identitySDK!.createIdentifier(
+          didName!,
+          wallet.signer!.address
+        );
+        await identitySDK!.storeDID(did, wallet.signer!.address);
+        alert("DID created successfully!");
+      } catch (e) {
+        console.log(e);
+      }
+    } else {
+      alert("Connect Wallet");
+    }
+  };
 
   async function onSubmit(values: z.infer<typeof issueCredFormSchema>) {
     if (isConnected) {
       values.issuer_address = wallet.signer!.address;
+      values.issuer_did = did;
       console.log(values);
       const {
         holder_address,
@@ -68,10 +92,19 @@ const IssueCredForm = () => {
         issuer_address: issuer_address,
         issuer_did: issuer_did,
       };
-      const credHash: string | undefined = await identitySDK!.issueCredential(
-        _credential
+      // const credHash: string | undefined = await identitySDK!.issueCredential(
+      //   _credential
+      // );
+      const isv = await identitySDK!.verifyDID(
+        _credential.issuer_did,
+        issuer_address
       );
-      alert(`Credential stored successfully with hash: ${credHash}`);
+      const hv = await identitySDK!.verifyDID(
+        _credential.holder_did,
+        holder_address
+      );
+      console.log(isv, hv);
+      // alert(`Credential stored successfully with hash: ${credHash}`);
     } else {
       alert("Connect Wallet");
     }
@@ -110,22 +143,43 @@ const IssueCredForm = () => {
               // a dropdown for issuer to choose did
               // If no did found {generate_did}
               issuerDIDs.length > 0 ? (
-                <div></div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    {did ? did : "Choose DID"}
+                  </DropdownMenuTrigger>
+                  {issuerDIDs.map((did: string) => (
+                    <DropdownMenuContent key={did} className="mx-7">
+                      {/* <DropdownMenuLabel>Y</DropdownMenuLabel> */}
+                      {/* <DropdownMenuSeparator /> */}
+                      <DropdownMenuItem onClick={() => setDid(did)}>
+                        {did}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  ))}
+                </DropdownMenu>
               ) : (
                 <FormItem>
-                  <FormLabel>Your DID</FormLabel>
+                  {/* <FormLabel>Your DID</FormLabel> */}
                   <FormControl>
-                    <div className="space-y-2">
-                      <Input {...field} disabled />
-                      <p
-                        className="text-blue-600 cursor-pointer"
-                        onClick={async () => {
-                          // const did: string =
-                          // await identitySDK!.storeDID(wallet.signer!.address);
-                        }}
-                      >
-                        Generate DID
-                      </p>
+                    <div>
+                      <Input {...field} disabled value="No DID found" />
+                      <Accordion type="single" collapsible>
+                        <AccordionItem value="item-1">
+                          <AccordionTrigger className="text-sm pl-2">
+                            Generate
+                          </AccordionTrigger>
+                          <AccordionContent className="space-y-2 mx-2">
+                            <Label>Name</Label>
+                            <Input
+                              placeholder="i.e. university"
+                              value={didName}
+                              onChange={(e) => setDidName(e.target.value)}
+                              className=""
+                            />
+                            <Button onClick={generateDid}>Create</Button>
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
                     </div>
                   </FormControl>
                   <FormMessage />

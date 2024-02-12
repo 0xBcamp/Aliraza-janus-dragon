@@ -1,4 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
+import { JsonRpcProvider, JsonRpcSigner } from "ethers";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -8,7 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 import { z } from "zod";
 
 export const issueCredFormSchema = z.object({
-  issuer_did: z.string().min(64),
+  issuer_did: z.any(),
   issuer_address: z.any(),
   holder_did: z.string().min(64),
   holder_address: z
@@ -31,5 +32,9 @@ export const links: NavbarLink[] = [
   {
     name: "Verify Credentials",
     href: "/verify",
+  },
+  {
+    name: "Profile",
+    href: "/profile",
   },
 ];
