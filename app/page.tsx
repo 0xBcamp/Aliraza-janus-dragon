@@ -1,70 +1,165 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-shadow */
-
-"use client";
-
-import { useEffect, useState } from "react";
 import {
-  LightSmartContractAccount,
-  getDefaultLightAccountFactoryAddress,
-} from "@alchemy/aa-accounts";
-import { AlchemyProvider } from "@alchemy/aa-alchemy";
-import { LocalAccountSigner, type Hex, SmartAccountSigner, WalletClientSigner } from "@alchemy/aa-core";
-import { sepolia } from "viem/chains";
-// IMP START - Quick Start
-import { Web3Auth } from "@web3auth/modal";
-import { CHAIN_NAMESPACES, IProvider } from "@web3auth/base";
-// IMP END - Quick Start
-import Web3 from "web3";
-import { createWalletClient, custom, encodeFunctionData } from "viem";
-import CounterABI from "../artifacts/contracts/Counter.sol/Counter.json";
+	EmailLoginInput,
+	EmailSignupInput,
+} from '@moonup/moon-api';
+import { useState } from 'react';
 
-require('dotenv').config()
+import { AUTH, MOON_SESSION_KEY, Storage } from '@moonup/moon-types';
+import { useMoonSDK } from './usemoonsdk';
+import CounterABI from "../../artifacts/contracts/Counter.sol/Counter.json";
+import {MoonSigner,MoonProvider, MoonProviderOptions} from '@moonup/ethers';
+import { createWalletClient, custom, encodeFunctionData } from 'viem';
+import { sepolia } from 'viem/chains';
+import { SmartAccountSigner, WalletClientSigner } from '@alchemy/aa-core';
+import { AlchemyProvider } from '@alchemy/aa-alchemy';
+import { LightSmartContractAccount, getDefaultLightAccountFactoryAddress } from '@alchemy/aa-accounts';
+import Web3 from 'web3';
+import { ethers } from 'ethers';
+import { convertEthersSignerToAccountSigner } from '@alchemy/aa-ethers';
 
-// IMP START - SDK Initialization
-// IMP START - Dashboard Registration
-const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string; // get from https://dashboard.web3auth.io
-// IMP END - Dashboard Registration
+require('dotenv').config();
 
-const chainConfig = {
-  chainNamespace: CHAIN_NAMESPACES.EIP155,
-  chainId: "0x1", // Please use 0x1 for Mainnet
-  rpcTarget: "https://rpc.ankr.com/eth",
-  displayName: "Ethereum Mainnet",
-  blockExplorer: "https://etherscan.io/",
-  ticker: "ETH",
-  tickerName: "Ethereum",
-};
+const SignupPage: React.FC = () => {
+	const [email, setEmail] = useState('');
+	const [password, setPassword] = useState('');
+	const [confirmPassword, setConfirmPassword] = useState('');
+	const [passwordError, setPasswordError] = useState('');
+	const [signupSuccess, setSignupSuccess] = useState(false);
+	const [signInSuccess, setSignInSuccess] = useState(false);
+	const [authenticatedAddress, setAuthenticatedAddress] = useState('');
+	const [alchemyProvider, setAlchemyProvider] = useState<AlchemyProvider | null>(null);
+  	const [loggedIn, setLoggedIn] = useState(false);
+	const [isConnected, setIsConnected] = useState(false);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
-const web3auth = new Web3Auth({
-  clientId,
-  chainConfig,
-  web3AuthNetwork: "sapphire_mainnet",
-});
-// IMP END - SDK Initialization
+	const { moon, connect,moonSigner,moonProvider, createAccount, disconnect, updateToken, initialize } =
+		useMoonSDK();
 
-function App() {
-  const [provider, setProvider] = useState<IProvider | null>(null);
-  const [alchemyProvider, setAlchemyProvider] = useState<AlchemyProvider | null>(null);
-  const [loggedIn, setLoggedIn] = useState(false);
+	const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setEmail(event.target.value);
+	};
 
-  useEffect(() => {
-    const init = async () => {
-      try {
-        // IMP START - SDK Initialization
-        await web3auth.initModal();
-        // IMP END - SDK Initialization
-        setProvider(web3auth.provider);
-         const walletClient = createWalletClient({
-      chain: sepolia, // can provide a different chain here
-      transport: custom(web3auth.provider as any),
-    });
+	const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setPassword(event.target.value);
+	};
 
-    const signer: SmartAccountSigner = new WalletClientSigner(
-      walletClient,
-      "json-rpc" // signerType
-    );
+	const handleConfirmPasswordChange = (
+		event: React.ChangeEvent<HTMLInputElement>
+	) => {
+		setConfirmPassword(event.target.value);
+	};
+
+	const handleInitializeAndConnect = async () => {
+		try {
+			setLoading(true);
+			setError(null);
+
+			// Initialize and connect to Moon
+			console.log('Initializing and connecting to Moon...');
+			await initialize();
+			await connect();
+			console.log('Connected to Moon!');
+			setIsConnected(true);
+		} catch (error) {
+			console.error('Error during connection:', error);
+			setError('Error connecting to Moon. Please try again.');
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const handleSignup = async () => {
+		try {
+			setLoading(true);
+			setError(null);
+
+			if (password !== confirmPassword) {
+				setPasswordError('Passwords do not match');
+			} else {
+				setPasswordError('');
+
+				// Sign up the user
+				const auth = moon?.getAuthSDK();
+				const signupRequest: EmailSignupInput = {
+					email,
+					password,
+				};
+				console.log('Signing up...');
+				const signupResponse: any = await auth?.emailSignup(signupRequest);
+				console.log('Signup successful:', signupResponse);
+
+				setSignupSuccess(true);
+			}
+		} catch (error) {
+			console.error('Error during signup:', error);
+			setError('Error signing up. Please try again.');
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const handleSignIn = async () => {
+		try {
+			setLoading(true);
+			setError(null);
+			
+			const auth = moon?.getAuthSDK();
+			const loginRequest: EmailLoginInput = {
+				email,
+				password,
+			};
+			console.log('Authenticating...');
+			const loginResponse: any = await auth?.emailLogin(loginRequest);
+			console.log('Authentication successful:', loginResponse);
+
+			// Set tokens and email
+			console.log('Updating tokens and email...');
+			await updateToken(
+				loginResponse.data.token,
+				loginResponse.data.refreshToken
+			);
+			moon?.MoonAccount.setEmail(email);
+			moon?.MoonAccount.setExpiry(loginResponse.data.expiry);
+			console.log('Tokens and email updated!');
+
+			// Perform sign-in logic with MoonSDK
+			console.log('Creating account...');
+			const newAccount = await createAccount();
+			console.log('New Account Data:', newAccount?.data);
+			console.log('Setting expiry and navigating...');
+			moon?.MoonAccount.setExpiry(loginResponse.data.expiry);
+			setSignInSuccess(true);
+			setAuthenticatedAddress(newAccount?.data?.data?.address);
+			console.log('Authenticated Address:', newAccount?.data.data?.address);
+			const config = {
+				Storage: {
+					key: MOON_SESSION_KEY,
+					type: Storage.SESSION,
+				},
+				Auth: {
+					AuthType: AUTH.JWT,
+				},
+			}
+		const options: MoonProviderOptions = {
+			chainId: 11155111,
+			SDK:moon,
+			address:newAccount?.data.data?.address
+		};
+			const moonProvider = new MoonProvider(options);
+			const web3 = new Web3(moonProvider);
+			console.log(web3)
+
+	// 		const walletClient = createWalletClient({
+    //   			chain: sepolia, // can provide a different chain here
+    //   			transport: custom(web3 as any),
+    // 		});
+	// console.log(walletClient)
+	const moonSigner2 = new MoonSigner(moonProvider, config)
+	console.log(moonSigner2)
+	const accountSigner: SmartAccountSigner = convertEthersSignerToAccountSigner(moonSigner2);
+	console.log(accountSigner)
+	console.log(await accountSigner.getAddress())
     // IMP END - Login
     const chain = sepolia;
 
@@ -77,81 +172,42 @@ function App() {
       (rpcClient) =>
         new LightSmartContractAccount({
           rpcClient,
-          owner:signer,
+          owner:accountSigner,
           chain,
           factoryAddress: getDefaultLightAccountFactoryAddress(chain),
         })
     );
-    setAlchemyProvider(alchemyProvider);
+	setAlchemyProvider(alchemyProvider)
+	console.log(alchemyProvider);
+		} catch (error) {
+			console.error('Error during sign-in:', error);
+			setError('Error signing in. Please try again.');
+		} finally {
+			setLoading(false);
+		}
+	};
 
-        if (web3auth.connected) {
-          setLoggedIn(true);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
 
-    init();
-  }, []);
 
-  const login = async () => {
-    // IMP START - Login
-    const web3authProvider = await web3auth.connect();
-    console.log(web3authProvider);
-    const web3 = new Web3(web3authProvider as any);
-    console.log(web3.provider);
-    console.log(await web3.eth.getAccounts());
-    const walletClient = createWalletClient({
-      chain: sepolia, // can provide a different chain here
-      transport: custom(web3authProvider as any),
-    });
+	const handleDisconnect = async () => {
+		try {
+			setLoading(true);
+			setError(null);
 
-    const signer: SmartAccountSigner = new WalletClientSigner(
-      walletClient,
-      "json-rpc" // signerType
-    );
-    // IMP END - Login
-    setProvider(web3authProvider);
-    const chain = sepolia;
+			// Disconnect from Moon
+			console.log('Disconnecting...');
+			await disconnect();
+			console.log('Disconnected');
+			setIsConnected(false);
+		} catch (error) {
+			console.error('Error during disconnection:', error);
+			setError('Error disconnecting from Moon. Please try again.');
+		} finally {
+			setLoading(false);
+		}
+	};
 
-    // Create a provider to send user operations from your smart account
-    const alchemyProvider = new AlchemyProvider({
-      // get your Alchemy API key at https://dashboard.alchemy.com
-      apiKey: process.env.NEXT_PUBLIC_API_KEY as string,
-      chain,
-    }).connect(
-      (rpcClient) =>
-        new LightSmartContractAccount({
-          rpcClient,
-          owner:signer,
-          chain,
-          factoryAddress: getDefaultLightAccountFactoryAddress(chain),
-        })
-    );
-    setAlchemyProvider(alchemyProvider);
-    if (web3auth.connected) {
-      setLoggedIn(true);
-    }
-  };
-
-  const getUserInfo = async () => {
-    // IMP START - Get User Information
-    const user = await web3auth.getUserInfo();
-    // IMP END - Get User Information
-    uiConsole(user);
-  };
-
-  const logout = async () => {
-    // IMP START - Logout
-    await web3auth.logout();
-    // IMP END - Logout
-    setProvider(null);
-    setLoggedIn(false);
-    uiConsole("logged out");
-  };
-
-  // IMP START - Blockchain Calls
+	  // IMP START - Blockchain Calls
   const getAccounts = async () => {
     if (!alchemyProvider) {
       uiConsole("provider not initialized yet");
@@ -335,27 +391,6 @@ function App() {
 
     console.log(txHash);
   }
-
-  const signMessage = async () => {
-    if (!provider) {
-      uiConsole("provider not initialized yet");
-      return;
-    }
-    const web3 = new Web3(provider as any);
-
-    // Get user's Ethereum public address
-    const fromAddress = (await web3.eth.getAccounts())[0];
-
-    const originalMessage = "YOUR_MESSAGE";
-
-    // Sign the message
-    const signedMessage = await web3.eth.personal.sign(
-      originalMessage,
-      fromAddress,
-      "test password!" // configure your own password here.
-    );
-    uiConsole(signedMessage);
-  };
   // IMP END - Blockchain Calls
 
   function uiConsole(...args: any[]): void {
@@ -366,14 +401,9 @@ function App() {
     }
   }
 
-  const loggedInView = (
+    const loggedInView = (
     <>
       <div className="flex-container">
-        <div>
-          <button onClick={getUserInfo} className="card">
-            Get User Info
-          </button>
-        </div>
         <div>
           <button onClick={getAccounts} className="card">
             Get Accounts
@@ -404,51 +434,132 @@ function App() {
             Decrement x 3
           </button>
         </div>
-        <div>
-          <button onClick={signMessage} className="card">
-            Sign Message
-          </button>
-        </div>
-        <div>
-          <button onClick={logout} className="card">
-            Log Out
-          </button>
-        </div>
       </div>
     </>
   );
 
-  const unloggedInView = (
-    <button onClick={login} className="card">
-      Login
-    </button>
-  );
+	return (
+		<div className="flex justify-center items-center h-screen">
+			{!isConnected && (
+				<div>
+					<h2 className="text-2xl font-bold mb-4 text-center">
+						Initialize & Connect to Moon
+					</h2>
+					<button
+						type="button"
+						className="bg-blue-500 text-white p-2 rounded"
+						onClick={handleInitializeAndConnect}
+					>
+						{loading ? 'Connecting...' : 'Initialize & Connect to Moon'}
+					</button>
+					{error && <p className="text-red-500 mt-2">{error}</p>}
+				</div>
+			)}
 
-  return (
-    <div className="container">
-      <h1 className="title">
-        <a target="_blank" href="https://web3auth.io/docs/sdk/pnp/web/modal" rel="noreferrer">
-          Web3Auth{" "}
-        </a>
-        & NextJS Quick Start
-      </h1>
+			{isConnected && !signupSuccess && !signInSuccess && (
+				<form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-96">
+					<div className="mb-4">
+						<h2 className="text-2xl font-bold mb-4 text-center">
+							Sign up for a Moon Account
+						</h2>
+						<input
+							type="email"
+							placeholder="Email"
+							className="w-full border p-2 rounded mb-2"
+							value={email}
+							onChange={handleEmailChange}
+						/>
+					</div>
+					<div className="mb-4">
+						<input
+							type="password"
+							placeholder="Password"
+							className="w-full border p-2 rounded mb-2"
+							value={password}
+							onChange={handlePasswordChange}
+						/>
+					</div>
+					<div className="mb-4">
+						<input
+							type="password"
+							placeholder="Confirm Password"
+							className={`w-full border p-2 rounded mb-2 ${
+								passwordError ? 'border-red-500' : ''
+							}`}
+							value={confirmPassword}
+							onChange={handleConfirmPasswordChange}
+						/>
+						{passwordError && (
+							<p className="text-red-500 text-xs italic">{passwordError}</p>
+						)}
+					</div>
+					<div className="flex justify-center">
+						<button
+							type="button"
+							className="bg-blue-500 text-white p-2 rounded"
+							onClick={handleSignup}
+						>
+							{loading ? 'Signing up...' : 'Sign up for a Moon Account'}
+						</button>
+						{error && <p className="text-red-500 ml-2">{error}</p>}
+					</div>
+				</form>
+			)}
 
-      <div className="grid">{loggedIn ? loggedInView : unloggedInView}</div>
-      <div id="console" style={{ whiteSpace: "pre-line" }}>
-        <p style={{ whiteSpace: "pre-line" }}></p>
-      </div>
+			{signupSuccess && !signInSuccess && isConnected && (
+				<div className="mb-4 text-center">
+					<p>Congratulations! Your Moon account is created.</p>
+					<p>Now that you have created an account, sign in.</p>
+					<form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-96">
+						<div className="mb-4">
+							<h2 className="text-2xl font-bold mb-4 text-center">Sign In</h2>
+							<input
+								type="email"
+								placeholder="Email"
+								className="w-full border p-2 rounded mb-2"
+								value={email}
+								onChange={handleEmailChange}
+							/>
+						</div>
+						<div className="mb-4">
+							<input
+								type="password"
+								placeholder="Password"
+								className="w-full border p-2 rounded mb-2"
+								value={password}
+								onChange={handlePasswordChange}
+							/>
+						</div>
+						<div className="flex justify-center">
+							<button
+								type="button"
+								className="bg-blue-500 text-white p-2 rounded"
+								onClick={handleSignIn}
+							>
+								{loading ? 'Signing in...' : 'Sign In'}
+							</button>
+							{error && <p className="text-red-500 ml-2">{error}</p>}
+						</div>
+					</form>
+				</div>
+			)}
 
-      <footer className="footer">
-        <a
-          href="https://github.com/Web3Auth/web3auth-pnp-examples/tree/main/web-modal-sdk/quick-starts/nextjs-modal-quick-start"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Source code
-        </a>
-      </footer>
-    </div>
-  );
-}
+			{signInSuccess && isConnected && (
+				<div className="mt-4 text-center">
+					<p>Authenticated Address: {authenticatedAddress}</p>
+					{loggedInView}
+					<button
+						type="button"
+						className="bg-red-500 text-white p-2 rounded mt-2"
+						onClick={handleDisconnect}
+					>
+						{loading ? 'Disconnecting...' : 'Disconnect from Moon'}
+					</button>
+					{error && <p className="text-red-500 mt-2">{error}</p>}
+				</div>
+			)}
+		</div>
+	);
+};
 
-export default App;
+export default SignupPage;
