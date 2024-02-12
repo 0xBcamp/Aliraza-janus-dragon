@@ -15,7 +15,7 @@ export interface DIContractInterface extends BaseContract {
   ): Promise<void>;
   getIssuedCredentials(did: string): Promise<string[]>;
   getHoldedCredentials(did: string): Promise<string[]>;
-  getDIDs(options?: any): Promise<string[]>;
+  getDIDs(address: string): Promise<string[]>;
   maxDIDs(): Promise<number>;
   getDIDStatus(did: string): Promise<DIDStatus>;
 }

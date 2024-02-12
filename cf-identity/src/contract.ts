@@ -1,7 +1,6 @@
 export const contract_address: string =
-  "0x954d92B7AA9Ba1c1Ed288669d80f2D55a297eE33";
+  "0xfB36F3A755F5cAcF3F674ACD25697BB91eEeF407";
 export const contract_abi = [
-  { inputs: [], stateMutability: "nonpayable", type: "constructor" },
   {
     inputs: [{ internalType: "uint256", name: "_dids", type: "uint256" }],
     name: "MAX_DIDs_Created",
@@ -63,7 +62,7 @@ export const contract_abi = [
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [{ internalType: "address", name: "user", type: "address" }],
     name: "getDIDs",
     outputs: [{ internalType: "string[]", name: "", type: "string[]" }],
     stateMutability: "view",
@@ -115,10 +114,9 @@ export const contract_abi = [
 ];
 
 export const test_contract_address: string =
-  "0x5fbdb2315678afecb367f032d93f642f64180aa3";
+  "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
 
 export const test_contract_abi = [
-  { type: "constructor", inputs: [], stateMutability: "nonpayable" },
   {
     type: "function",
     name: "assignDID",
@@ -142,7 +140,7 @@ export const test_contract_abi = [
   {
     type: "function",
     name: "getDIDs",
-    inputs: [{ name: "_user", type: "address", internalType: "address" }],
+    inputs: [{ name: "user", type: "address", internalType: "address" }],
     outputs: [{ name: "", type: "string[]", internalType: "string[]" }],
     stateMutability: "view",
   },

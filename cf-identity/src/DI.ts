@@ -1,29 +1,24 @@
 import { createHash } from "crypto";
 import {
-  AbstractSigner,
-  BaseContract,
   Contract,
-  HDNodeWallet,
   JsonRpcSigner,
   Signer,
   ethers,
 } from "ethers";
 import { DIContractInterface } from "./interfaces/Contract";
-import { ThirdwebStorage } from "@thirdweb-dev/storage";
 import dotenv from "dotenv";
 import {
   contract_abi,
   contract_address,
-  test_contract_abi,
-  test_contract_address,
 } from "./contract";
 import assert from "assert";
 import { Credential } from "./types/types";
+import { NFTStorage, File, Blob, CIDString } from "nft.storage";
 dotenv.config();
 
 export class DecentralizeIdentity {
   private contract: DIContractInterface;
-  storage: ThirdwebStorage;
+  storage: NFTStorage;
 
   constructor(signer: JsonRpcSigner | Signer, storage_secret_key: string) {
     const _contract: Contract = new ethers.Contract(
@@ -32,9 +27,7 @@ export class DecentralizeIdentity {
       signer.provider
     );
     this.contract = _contract.connect(signer) as DIContractInterface;
-    this.storage = new ThirdwebStorage({
-      secretKey: storage_secret_key,
-    });
+    this.storage = new NFTStorage({ token: storage_secret_key });
   }
 
   /**
@@ -68,12 +61,12 @@ export class DecentralizeIdentity {
   };
 
   removeDID = async (did: string, address: string) => {
-    try{
-      this.contract.removeDID(did, {from:address});
-    } catch(error){
+    try {
+      this.contract.removeDID(did, { from: address });
+    } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   /**
    * @notice This function do double verification of the did, both OnChain and OffChain.
@@ -88,7 +81,7 @@ export class DecentralizeIdentity {
         /^did:.+:[a-z0-9]+$/.test(did) && cid_hash.length === 64,
         "Invalid DID"
       );
-      const user_dids: string[] = await this.contract.getDIDs({from:address});
+      const user_dids: string[] = await this.contract.getDIDs(address);
       const isDidOnChainVerified: boolean = user_dids.includes(did);
       const name: string = did.split(":")[1];
       const expected_did: string = this.createIdentifier(name, address);
@@ -99,7 +92,9 @@ export class DecentralizeIdentity {
     }
   };
 
-  issueCredential = async (data: Credential): Promise<string | undefined> => {
+  issueCredential = async (
+    data: Credential
+  ): Promise<CIDString | undefined> => {
     const {
       credential,
       holder_address,
@@ -119,17 +114,23 @@ export class DecentralizeIdentity {
       throw new Error("Invalid Issuer or Holder DID");
     } else {
       try {
-        const ipfs_cid: string = await this.storage.upload(credential);
-        const cid: string = ipfs_cid.split("/")[2];
+        const credentialBlob: Blob = new Blob([credential]);
+        const ipfs_cid: CIDString = await this.storage.storeBlob(
+          credentialBlob
+        );
         // checking if the credentials have not been issued already
         const credentials: string[] = await this.contract.getIssuedCredentials(
           issuer_did
         );
-        if (credentials.includes(cid)) {
+        if (credentials.includes(ipfs_cid)) {
           throw new Error("Credentils issued already!");
         } else {
-          await this.contract.issueCredentials(issuer_did, holder_did, cid);
-          return cid;
+          await this.contract.issueCredentials(
+            issuer_did,
+            holder_did,
+            ipfs_cid
+          );
+          return ipfs_cid;
         }
       } catch (error) {
         console.log(error);
@@ -138,8 +139,7 @@ export class DecentralizeIdentity {
   };
 
   /**
-   *
-   * @param credential cid of the credential to verify
+   * @param credential CID of the credential to verify
    * @param issuer_did identifier of the issuer of credential
    * @param holder_did identifier of the holder of credential
    */
@@ -185,7 +185,7 @@ export class DecentralizeIdentity {
    */
   getDIDs = async (address: string): Promise<string[] | undefined> => {
     try {
-      const dids = await this.contract.getDIDs({from:address});
+      const dids = await this.contract.getDIDs(address);
       return dids;
     } catch (error) {
       console.log(error);
@@ -200,5 +200,12 @@ export class DecentralizeIdentity {
   getContractAddress = async (): Promise<string> => {
     const address: string = await this.contract.getAddress();
     return address;
+  };
+
+  getCredentialData = async (cid: string) => {
+    const dataURL: string = `https://${cid}.ipfs.nftstorage.link`;
+    console.log(dataURL);
+    const response = await (await fetch(dataURL)).text();
+    return JSON.parse(response);
   };
 }
