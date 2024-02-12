@@ -1,37 +1,89 @@
-# Web3Auth (`@web3auth/modal`) x EVM x Next.js
+# @moonup Moon Packages
 
-[![Web3Auth](https://img.shields.io/badge/Web3Auth-SDK-blue)](https://web3auth.io/docs/sdk/pnp/web/modal)
-[![Web3Auth](https://img.shields.io/badge/Web3Auth-Community-cyan)](https://community.web3auth.io)
 
-[Join our Community Portal](https://community.web3auth.io/) to get support and stay up to date with the latest news and updates.
-
-This example demonstrates how to use Web3Auth with EVM in Next.js
-
-## How to Use
-
-### Download Manually
-
+## Usage
+Packages are published to npm under the @moonup scope. To install a package, run:
 ```bash
-npx degit Web3Auth/web3auth-pnp-examples/web-modal-sdk/quick-starts/nextjs-modal-quick-start w3a-example
+npm install @moonup/<package-name>
+```
+For example, to install the Moon API client, run:
+```bash
+npm install @moonup/moon-api
+```
+Refer to the documentation for each package for usage instructions.
+(https://docs.usemoon.ai)[https://docs.usemoon.ai]
+
+
+## @moonup/types: 
+Typescript types for all packages
+### usage
+Install the package
+```bash
+npm install @moonup/types
+```
+Import the types
+```typescript
+import { Moon } from '@moonup/types'
+```
+## @moonup/moon-sdk:
+Core entry point which will handle everything from jwt token storage to network changes etc, as well as sub class initialisation
+### usage
+Install the package
+```bash
+npm install @moonup/moon-sdk
+```
+import the sdk
+```typescript
+import { MoonSDK } from '@moonup/moon-sdk'
 ```
 
-Install & Run:
+## @moonup/moon-api: 
+Moon API client
 
+### usage
+Install the package
 ```bash
-cd w3a-example
-npm install
-npm run dev
-# or
-cd w3a-example
-yarn
-yarn dev
+npm install @moonup/moon-api
 ```
 
-## Important Links
+import the client
+```typescript
+import { MoonAPI } from '@moonup/moon-api'
+```
 
-- [Website](https://web3auth.io)
-- [Docs](https://web3auth.io/docs)
-- [Guides](https://web3auth.io/docs/content-hub?type=guides)
-- [SDK / API References](https://web3auth.io/docs/sdk)
-- [Pricing](https://web3auth.io/pricing.html)
-- [Community Portal](https://community.web3auth.io)
+
+
+## @moonup/moon-sdk: 
+Core entry point which will handle everything from jwt token storage to network changes etc, as well as sub class initialisation
+
+### usage
+Install the package
+```bash
+npm install @moonup/moon-sdk
+```
+
+
+## @moonup/ethers: 
+ethers.js provider and signer classes
+### usage
+Install the package
+```bash
+npm install @moonup/ethers
+```
+
+
+## @moonup/wagmi-connector:
+Wagmi connector
+### usage
+Install the package
+```bash
+npm install @moonup/wagmi-connector
+```
+
+## @moonup/rainbowkit
+Rainbow kit library
+### usage
+Install the package
+```bash
+npm install @moonup/rainbowkit
+```

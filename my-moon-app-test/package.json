@@ -1,0 +1,36 @@
+{
+  "name": "my-moon-app-test",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@alchemy/aa-accounts": "^2.4.0",
+    "@alchemy/aa-alchemy": "^2.4.0",
+    "@alchemy/aa-core": "^2.3.1",
+    "@alchemy/aa-ethers": "^2.3.1",
+    "dotenv": "^16.4.2",
+    "ethers": "^5.7.2",
+    "next": "latest",
+    "next-pwa": "^5.6.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "viem": "^1.21.4",
+    "web3": "^4.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10",
+    "eslint": "^8",
+    "eslint-config-next": "*",
+    "postcss": "^8",
+    "tailwindcss": "^3",
+    "typescript": "^5"
+  }
+}
