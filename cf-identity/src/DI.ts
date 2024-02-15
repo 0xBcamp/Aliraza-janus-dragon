@@ -1,16 +1,8 @@
 import { createHash } from "crypto";
-import {
-  Contract,
-  JsonRpcSigner,
-  Signer,
-  ethers,
-} from "ethers";
+import { Contract, JsonRpcSigner, Signer, ethers } from "ethers";
 import { DIContractInterface } from "./interfaces/Contract";
 import dotenv from "dotenv";
-import {
-  contract_abi,
-  contract_address,
-} from "./contract";
+import { contract_abi, contract_address } from "./contract";
 import assert from "assert";
 import { Credential } from "./types/types";
 import { NFTStorage, File, Blob, CIDString } from "nft.storage";
@@ -53,7 +45,7 @@ export class DecentralizeIdentity {
       if (isValidDid) {
         throw new Error("DID already exists");
       } else {
-        await this.contract.assignDID(did, { from: address });
+        await this.contract.assignDID(did);
       }
     } catch (error) {
       console.log(error);
@@ -62,7 +54,7 @@ export class DecentralizeIdentity {
 
   removeDID = async (did: string, address: string) => {
     try {
-      this.contract.removeDID(did, { from: address });
+      this.contract.removeDID(did);
     } catch (error) {
       console.log(error);
     }
@@ -92,6 +84,11 @@ export class DecentralizeIdentity {
     }
   };
 
+  /**
+   * Issue Credentials
+   * @param data - an Object of type Credential containing the credential (object), holder address, holder did, issuer address, and issuer did
+   * @returns the ipfs CID of the credential stored.
+   */
   issueCredential = async (
     data: Credential
   ): Promise<CIDString | undefined> => {
@@ -114,7 +111,7 @@ export class DecentralizeIdentity {
       throw new Error("Invalid Issuer or Holder DID");
     } else {
       try {
-        const credentialBlob: Blob = new Blob([credential]);
+        const credentialBlob: Blob = new Blob([JSON.stringify(credential)]);
         const ipfs_cid: CIDString = await this.storage.storeBlob(
           credentialBlob
         );
@@ -123,7 +120,7 @@ export class DecentralizeIdentity {
           issuer_did
         );
         if (credentials.includes(ipfs_cid)) {
-          throw new Error("Credentils issued already!");
+          throw new Error("Credentials issued already!");
         } else {
           await this.contract.issueCredentials(
             issuer_did,
@@ -202,7 +199,11 @@ export class DecentralizeIdentity {
     return address;
   };
 
-  getCredentialData = async (cid: string) => {
+  /**
+   * @param cid ipfs CID of the credential
+   * @returns the data (object) of the credential
+   */
+  getCredentialData = async (cid: string): Promise<Object> => {
     const dataURL: string = `https://${cid}.ipfs.nftstorage.link`;
     console.log(dataURL);
     const response = await (await fetch(dataURL)).text();

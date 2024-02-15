@@ -1,13 +1,13 @@
 export const contract_address: string =
-  "0xfB36F3A755F5cAcF3F674ACD25697BB91eEeF407";
+  "0xFe8EC01a4BfA56c63D1E4354D58D35Dc428037f2";
 export const contract_abi = [
+  { inputs: [], name: "InvalidDIDOwner", type: "error" },
   {
     inputs: [{ internalType: "uint256", name: "_dids", type: "uint256" }],
     name: "MAX_DIDs_Created",
     type: "error",
   },
   { inputs: [], name: "UNDEFINED_OR_EXPIRED_DID", type: "error" },
-  { inputs: [], name: "Unauthorized", type: "error" },
   {
     anonymous: false,
     inputs: [

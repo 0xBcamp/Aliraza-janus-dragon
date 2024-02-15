@@ -6,8 +6,8 @@ enum DIDStatus {
 }
 
 export interface DIContractInterface extends BaseContract {
-  assignDID(did: string, options?: any): Promise<void>;
-  removeDID(did: string, options?: any): Promise<void>;
+  assignDID(did: string): Promise<void>;
+  removeDID(did: string): Promise<void>;
   issueCredentials(
     issuer_did: string,
     holder_did: string,
