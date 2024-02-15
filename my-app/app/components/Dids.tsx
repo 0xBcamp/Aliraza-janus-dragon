@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { IdentityContext, WalletContext } from "@/providers/Providers";
 import { Label } from "@radix-ui/react-label";
@@ -32,7 +33,9 @@ const Dids = () => {
 
   useEffect(() => {
     async function fetchDIDs() {
-      const user_dids = await identitySDK!.getDIDs(wallet.signer!.address);
+      const user_dids: string[] | undefined = await identitySDK!.getDIDs(
+        wallet.signer!.address
+      );
       setDids(user_dids || []);
       console.log(user_dids);
     }
@@ -41,17 +44,39 @@ const Dids = () => {
     }
   }, [wallet]);
   return (
-    <div>
-      <div className="space-y-2">
-        <p className="pb-2">Create Your Identifier</p>
-        <Label>Name</Label>
+    <div className="space-y-12">
+      <div className="space-y-3">
+        <p className="pb-4 text-2xl font-medium">Create Your Identifier</p>
+        <Label className="pb-1">Name</Label>
         <Input
           placeholder="i.e. university"
           value={didName}
           onChange={(e) => setDidName(e.target.value)}
           className=""
         />
-        <Button onClick={generateDid}>Generate DID</Button>
+        <div className="pt-2">
+          <Button onClick={generateDid} className="">
+            Generate DID
+          </Button>
+        </div>
+      </div>
+      <div className="space-y-2">
+        <p className="text-2xl font-medium pb-2">Your DIDs</p>
+        {dids.length > 0 ? (
+          dids.map((did) => (
+            <Card key={did}>
+              <CardContent className="pt-3 h-12">
+                <p className="text-sm md:text-base lg:text-lg xl:text-xl break-words">
+                  {did}
+                </p>
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          <p className="text-2xl font-medium text-gray-600 opacity-45">
+            No DID Found
+          </p>
+        )}
       </div>
     </div>
   );

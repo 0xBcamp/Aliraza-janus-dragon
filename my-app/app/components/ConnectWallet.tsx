@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ethers, toNumber } from "ethers";
 import { IdentityContext, WalletContext } from "@/providers/Providers";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,10 @@ export function ConnectWallet() {
       }
     }
   };
+
+  useEffect(() => {
+    handleConnect();
+  }, []);
 
   return (
     <div>

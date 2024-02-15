@@ -57,7 +57,8 @@ const IssueCredForm = () => {
     }
   }, [wallet]);
 
-  const generateDid = async () => {
+  const generateDid = async (e: any) => {
+    e.preventDefault();
     if (isConnected) {
       try {
         const did: string = identitySDK!.createIdentifier(
@@ -119,11 +120,6 @@ const IssueCredForm = () => {
     console.log(updatedFields);
   };
 
-  const createCredential = (e: any) => {
-    e.preventDefault();
-    console.log("Form data:", credFormFields);
-  };
-
   async function onSubmit(values: z.infer<typeof issueCredFormSchema>) {
     if (isConnected) {
       values.issuer_address = wallet.signer!.address;
@@ -138,12 +134,13 @@ const IssueCredForm = () => {
         issuer_address,
       } = values;
       const _credential: Credential = {
-        credential: credential,
+        credential: JSON.stringify(credential),
         holder_address: holder_address,
         holder_did: holder_did,
         issuer_address: issuer_address,
         issuer_did: issuer_did,
       };
+      console.log(_credential, _credential.credential);
       try {
         const credHash: string | undefined = await identitySDK!.issueCredential(
           _credential
@@ -277,7 +274,7 @@ const IssueCredForm = () => {
             control={issueCredForm.control}
             name="credential"
             render={({ field }) => (
-              <FormItem className="md:w-1/2 px-3">
+              <FormItem className="md:w-1/2 lg:px-3 px-0">
                 <FormLabel>Credential</FormLabel>
                 <div>
                   {Object.keys(credFormFields).map(
@@ -312,9 +309,6 @@ const IssueCredForm = () => {
                   <div className="space-y-4">
                     <div className="flex flex-col w-1/4 gap-y-3 pt-2">
                       <Button onClick={handleAddField}>Add Field</Button>
-                      <Button onClick={createCredential}>
-                        Create Credential
-                      </Button>
                     </div>
                     <div className="p-4 bg-gray-100 rounded-md shadow-md">
                       <p className="text-xl font-semibold mb-4">
@@ -334,9 +328,11 @@ const IssueCredForm = () => {
               </FormItem>
             )}
           />
-          <Button type="submit" className="mt-4 md:mt-8">
-            Submit
-          </Button>
+          <div className="w-1/3 gap-y-3">
+            <Button type="submit" className="px-8 py-1">
+              Submit
+            </Button>
+          </div>
         </form>
       </Form>
     </div>
