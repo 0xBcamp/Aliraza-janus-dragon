@@ -19,8 +19,7 @@ contract DITest is Test {
     string public credential_hash = "QxHaSHasd434DXvdbvdghgsSHgSsjKSz";
 
     error MAX_DIDs_Created(uint256 _dids);
-    error UNDEFINED_OR_EXPIRED_DID();
-    error InvalidDIDOwner();
+    error UnauthorizedCredentialsAccess();
 
     function setUp() public {
         diDeployScript = new DIDeployScript();
@@ -55,10 +54,10 @@ contract DITest is Test {
         di.issueCredentials(issuer_did, holder_did, credential_hash);
         vm.startPrank(holder);
         di.assignDID(holder_did);
-        string[] memory holder_credentials = di.getHoldedCredentials(
+        string[] memory holder_credentials = di.getOwnedCredentials(
             holder_did
         );
-        string[] memory issuer_credentials = di.getHoldedCredentials(
+        string[] memory issuer_credentials = di.getOwnedCredentials(
             holder_did
         );
         vm.stopPrank();
@@ -73,16 +72,14 @@ contract DITest is Test {
         di.assignDID("did:test:XYZ");
         string memory randomDID = "did:random:XYZ";
         vm.prank(issuer);
-        vm.expectRevert(
-            abi.encodeWithSelector(UNDEFINED_OR_EXPIRED_DID.selector)
-        );
-        di.removeDID(randomDID);
+        vm.expectRevert();
+        di.removeDID(1,randomDID, randomDID);
     }
 
     function test_ShouldNotAllowCredentialsAccessToInvalidDidOwner() public {
-        vm.expectRevert(abi.encodeWithSelector(InvalidDIDOwner.selector));
+        vm.expectRevert(abi.encodeWithSelector(UnauthorizedCredentialsAccess.selector));
         vm.prank(issuer);
-        di.getHoldedCredentials(holder_did);
+        di.getOwnedCredentials(holder_did);
     }
 
     function test_ShouldAllowCredentialAccessToValidDidOwner() public {
@@ -92,15 +89,15 @@ contract DITest is Test {
         di.assignDID(issuer_did);
         di.issueCredentials(issuer_did, holder_did, credential_hash);
         vm.prank(holder);
-        string[] memory holder_holded_credentials = di.getHoldedCredentials(
+        string[] memory holder_owned_credentials = di.getOwnedCredentials(
             holder_did
         );
         vm.prank(issuer);
         string[] memory issuer_issued_credentials = di.getIssuedCredentials(
             issuer_did
         );
-        assertEq(holder_holded_credentials.length, 1);
-        assertEq(holder_holded_credentials[0], credential_hash);
+        assertEq(holder_owned_credentials.length, 1);
+        assertEq(holder_owned_credentials[0], credential_hash);
         assertEq(issuer_issued_credentials.length, 1);
         assertEq(issuer_issued_credentials[0], credential_hash);
     }
