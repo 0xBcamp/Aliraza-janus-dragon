@@ -4,8 +4,8 @@ import {
   IdentityContextProvider,
   WalletContextProvider,
 } from "@/providers/Providers";
-import { ConnectWallet } from "./components/ConnectWallet";
 import Navbar from "./components/Navbar";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function RootLayout({
   children,
@@ -17,13 +17,14 @@ export default function RootLayout({
       <head>
         <title>ChainFusion</title>
       </head>
-      <body>
+      <body className="bg-gray-100 px-4">
         <WalletContextProvider>
           <IdentityContextProvider>
             <Navbar />
             {children}
           </IdentityContextProvider>
         </WalletContextProvider>
+        <Toaster />
       </body>
     </html>
   );

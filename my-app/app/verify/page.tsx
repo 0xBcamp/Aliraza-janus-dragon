@@ -1,15 +1,17 @@
-"use client";
-import { IdentityContext } from "@/providers/Providers";
-import React, { useContext } from "react";
+import React, { Suspense, useContext } from "react";
+import Verify from "../components/Verify";
 
 const page = () => {
-  const { identitySDK } = useContext(IdentityContext);
-
   return (
-    <div className="p-[1rem]">
-      <p className="lg:text-4xl text-3xl font-semibold text-center">
+    <div className="p-4 lg:p-8">
+      <p className="text-4xl lg:text-5xl font-semibold text-center pb-8">
         Verify Credentials
       </p>
+      <div className="pt-[2.5rem]">
+        <Suspense fallback={<div></div>}>
+          <Verify />
+        </Suspense>
+      </div>
     </div>
   );
 };

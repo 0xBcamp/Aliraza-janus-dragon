@@ -19,6 +19,14 @@ export const issueCredFormSchema = z.object({
   credential: z.any(),
 });
 
+export const authFormSchema = z.object({
+  address: z
+    .string()
+    .min(42, { message: "Invalid wallet address" })
+    .max(42, { message: "Invalid wallet address" }),
+  credential: z.string().min(10, {message: "Invalid credential cid"}),
+})
+
 export type NavbarLink = {
   name: string;
   href: string;
@@ -36,5 +44,9 @@ export const links: NavbarLink[] = [
   {
     name: "Profile",
     href: "/profile",
+  },
+  {
+    name: "Authorization",
+    href: "/auth",
   },
 ];

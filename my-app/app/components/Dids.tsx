@@ -3,9 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { IdentityContext, WalletContext } from "@/providers/Providers";
 import { Label } from "@radix-ui/react-label";
 import { useContext, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const Dids = () => {
   const { identitySDK } = useContext(IdentityContext);
@@ -22,12 +24,13 @@ const Dids = () => {
           wallet.signer!.address
         );
         await identitySDK!.storeDID(did, wallet.signer!.address);
-        alert("DID created successfully!");
+        toast.success("DID created successfully!");
       } catch (e) {
+        toast.error("Failed to create DID");
         console.log(e);
       }
     } else {
-      alert("Connect Wallet");
+      toast("Connect Wallet");
     }
   };
 
@@ -60,20 +63,20 @@ const Dids = () => {
           </Button>
         </div>
       </div>
-      <div className="space-y-2">
-        <p className="text-2xl font-medium pb-2">Your DIDs</p>
+      <div className="gap-4">
+        <p className="pb-4 text-2xl font-medium">Your DIDs</p>
         {dids.length > 0 ? (
-          dids.map((did) => (
-            <Card key={did}>
-              <CardContent className="pt-3 h-12">
-                <p className="text-sm md:text-base lg:text-lg xl:text-xl break-words">
-                  {did}
-                </p>
-              </CardContent>
-            </Card>
-          ))
+          <ScrollArea className="h-[350px] rounded-md border p-4">
+            {dids.map((did) => (
+              <Card key={did} className="flex justify-center ">
+                <CardContent className="py-2 px-3 h-auto">
+                  <p className="break-all font-mono">{did}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </ScrollArea>
         ) : (
-          <p className="text-2xl font-medium text-gray-600 opacity-45">
+          <p className="text-2xl font-medium text-gray-600 opacity-45 self-center">
             No DID Found
           </p>
         )}

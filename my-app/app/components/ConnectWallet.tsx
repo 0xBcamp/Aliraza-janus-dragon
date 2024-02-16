@@ -4,6 +4,7 @@ import { ethers, toNumber } from "ethers";
 import { IdentityContext, WalletContext } from "@/providers/Providers";
 import { Button } from "@/components/ui/button";
 import { DecentralizeIdentity } from "cf-identity";
+import { toast } from "sonner";
 
 export function ConnectWallet() {
   const { identitySDK, setIdentitySDK } = useContext(IdentityContext);
@@ -12,13 +13,13 @@ export function ConnectWallet() {
 
   const handleConnect = async () => {
     if ((window as any).ethereum == undefined) {
-      alert("Metamask is not installed!");
+      toast("Metamask is not installed!");
     } else {
       try {
         const provider = new ethers.BrowserProvider((window as any).ethereum);
         const signer = await provider.getSigner();
         if (toNumber((await provider.getNetwork()).chainId) !== 80001) {
-          alert("Connect to Mumbai Network");
+          toast("Connect to Mumbai Network");
         } else {
           setWallet({
             provider: provider,

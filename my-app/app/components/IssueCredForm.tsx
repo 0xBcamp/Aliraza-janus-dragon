@@ -33,6 +33,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 const IssueCredForm = () => {
   const [issuerDIDs, setIssuerDIDs] = useState<string[]>([]);
@@ -66,12 +67,13 @@ const IssueCredForm = () => {
           wallet.signer!.address
         );
         await identitySDK!.storeDID(did, wallet.signer!.address);
-        alert("DID created successfully!");
+        toast.success("DID created successfully!");
       } catch (e) {
         console.log(e);
+        toast.error("Failed to create DID");
       }
     } else {
-      alert("Connect Wallet");
+      toast("Connect Wallet");
     }
   };
 
@@ -122,6 +124,7 @@ const IssueCredForm = () => {
 
   async function onSubmit(values: z.infer<typeof issueCredFormSchema>) {
     if (isConnected) {
+      const loadingId = toast.loading("Storing Credential...");
       values.issuer_address = wallet.signer!.address;
       values.issuer_did = did;
       values.credential = credFormFields;
@@ -134,7 +137,7 @@ const IssueCredForm = () => {
         issuer_address,
       } = values;
       const _credential: Credential = {
-        credential: JSON.stringify(credential),
+        credential: credential,
         holder_address: holder_address,
         holder_did: holder_did,
         issuer_address: issuer_address,
@@ -145,12 +148,14 @@ const IssueCredForm = () => {
         const credHash: string | undefined = await identitySDK!.issueCredential(
           _credential
         );
-        alert(`Credential stored successfully with hash: ${credHash}`);
+        toast.dismiss(loadingId);
+        toast.success(`Credential stored successfully with hash: ${credHash}`);
       } catch (error) {
         console.log(error);
+        toast.error("Failed to store credential");
       }
     } else {
-      alert("Connect Wallet");
+      toast("Connect Wallet");
     }
   }
 
@@ -196,8 +201,11 @@ const IssueCredForm = () => {
                     <DropdownMenuContent key={did} className="mx-7">
                       {/* <DropdownMenuLabel></DropdownMenuLabel> */}
                       {/* <DropdownMenuSeparator /> */}
-                      <DropdownMenuItem onClick={() => setDid(did)}>
-                        {did}
+                      <DropdownMenuItem
+                        onClick={() => setDid(did)}
+                        className=""
+                      >
+                        <p className="break-all">{did}</p>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   ))}
@@ -310,17 +318,19 @@ const IssueCredForm = () => {
                     <div className="flex flex-col w-1/4 gap-y-3 pt-2">
                       <Button onClick={handleAddField}>Add Field</Button>
                     </div>
-                    <div className="p-4 bg-gray-100 rounded-md shadow-md">
+                    <div className="p-4 bg-gray-200 rounded-md shadow-md">
                       <p className="text-xl font-semibold mb-4">
                         Your Credential
                       </p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {Object.keys(credFormFields).map((key: string) => (
-                          <div className="flex gap-x-4" key={key}>
-                            <p className="font-semibold">{key}</p>
-                            <p>{credFormFields[key]}</p>
-                          </div>
-                        ))}
+                        {Object.keys(credFormFields).map(
+                          (key: string, index: number) => (
+                            <div className="flex gap-x-4" key={index}>
+                              <p className="font-semibold">{key}</p>
+                              <p className="break-all">{credFormFields[key]}</p>
+                            </div>
+                          )
+                        )}
                       </div>
                     </div>
                   </div>

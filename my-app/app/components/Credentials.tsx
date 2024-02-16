@@ -11,17 +11,18 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Credentials = () => {
   const { identitySDK } = useContext(IdentityContext);
   const [issuedCredentialsCids, setIssuedCredentialsCids] = useState<string[]>(
     []
   );
-  const [holdedCredentialsCids, setHoldedCredentialsCids] = useState<string[]>(
+  const [ownedCredentialsCids, setOwnedCredentialsCids] = useState<string[]>(
     []
   );
   const [issuedCredentials, setIssuedCredentials] = useState<any[]>([]);
-  const [holdedCredentials, setHoldedCredentials] = useState<any[]>([]);
+  const [ownedCredentials, setOwnedCredentials] = useState<any[]>([]);
   const { wallet } = useContext(WalletContext);
   const { isConnected } = wallet;
   useEffect(() => {
@@ -35,37 +36,37 @@ const Credentials = () => {
 
           await Promise.all(
             user_dids.map(async (did: string) => {
-              const h_cred: string[] = await identitySDK!.getHoldedCredentials(
+              const o_cred: string[] = await identitySDK!.getOwnedCredentials(
                 did
               );
               const i_cred: string[] = await identitySDK!.getIssuedCredentials(
                 did
               );
-              console.log(i_cred, h_cred);
+              console.log(i_cred, o_cred);
               allHCreds.push(
-                ...h_cred.filter((cred) => !allHCreds.includes(cred))
+                ...o_cred.filter((cred) => !allHCreds.includes(cred))
               );
               allICreds.push(
                 ...i_cred.filter((cred) => !allICreds.includes(cred))
               );
             })
           );
-          setHoldedCredentialsCids(allHCreds);
+          setOwnedCredentialsCids(allHCreds);
           setIssuedCredentialsCids(allICreds);
-          const hc_data: Object[] = await Promise.all(
+          const hc_data: any[] = await Promise.all(
             allHCreds.map(async (hc: string) => {
               return await identitySDK!.getCredentialData(hc);
             })
           );
           console.log("holded", hc_data);
-          const ic_data: Object[] = await Promise.all(
+          const ic_data: any[] = await Promise.all(
             allICreds.map(async (ic: string) => {
               return await identitySDK!.getCredentialData(ic);
             })
           );
           console.log("issued", ic_data);
           setIssuedCredentials(ic_data);
-          setHoldedCredentials(hc_data);
+          setOwnedCredentials(hc_data);
         }
       } catch (error) {
         console.log(error);
@@ -76,66 +77,76 @@ const Credentials = () => {
     }
   }, [wallet]);
   return (
-    <div>
-      <div>
+    <div className="space-y-12">
+      <div className="space-y-3">
         <p className="text-2xl font-medium">Issued Credentials</p>
-        {issuedCredentialsCids.length > 0 ? (
-          issuedCredentialsCids.map((ic_cid: string, i: number) => (
-            <Dialog>
-              <DialogTrigger>
-                <Card key={ic_cid}>
-                  <CardContent className="pt-3 h-12">
-                    <p className="text-sm md:text-base lg:text-lg xl:text-xl break-words">
-                      {ic_cid}
-                    </p>
-                  </CardContent>
-                </Card>
-              </DialogTrigger>
-              <DialogContent>
-                {Object.entries(issuedCredentials[i]).map(([key, value]) => (
-                  <p className="text-sm md:text-base lg:text-lg xl:text-xl break-words">
-                    {key}: {String(value)}
-                  </p>
-                ))}
-              </DialogContent>
-            </Dialog>
-          ))
-        ) : (
-          <p className="text-2xl font-medium text-gray-700 opacity-50 pt-[0.5rem]">
-            {" "}
-            No Issued Credentials
-          </p>
-        )}
+        <ScrollArea className="h-[350px] rounded-md border p-4">
+          {issuedCredentialsCids.length > 0 ? (
+            issuedCredentialsCids.map((ic_cid: string, i: number) => (
+              <Dialog key={ic_cid}>
+                <DialogTrigger>
+                  <Card className="cursor-pointer">
+                    <CardContent className="py-3 h-auto">
+                      <p className="break-all font-mono">{ic_cid}</p>
+                    </CardContent>
+                  </Card>
+                </DialogTrigger>
+                <DialogContent className="p-4">
+                  {issuedCredentials.length > 0
+                    ? Object.entries(issuedCredentials[i]).map(
+                        ([key, value]) => (
+                          <p key={key} className="break-all font-mono">
+                            <span className="font-bold">{key}</span>:{" "}
+                            {String(value)}
+                          </p>
+                        )
+                      )
+                    : null}
+                </DialogContent>
+              </Dialog>
+            ))
+          ) : (
+            <p className="text-2xl font-medium text-gray-700 opacity-50 pt-2">
+              No Issued Credentials
+            </p>
+          )}
+        </ScrollArea>
       </div>
-      <div>
-        <p className="text-2xl font-medium pt-[4rem]">Holded Credentials</p>
-        {holdedCredentialsCids.length > 0 ? (
-          holdedCredentialsCids.map((hc_cid: string, i: number) => (
-            <Dialog>
-              <DialogTrigger>
-                <Card key={hc_cid}>
-                  <CardContent className="pt-3 h-12">
-                    <p className="text-sm md:text-base lg:text-lg xl:text-xl break-words">
-                      {hc_cid}
-                    </p>
-                  </CardContent>
-                </Card>
-              </DialogTrigger>
-              <DialogContent>
-                {Object.entries(holdedCredentials[i]).map(([key, value]) => (
-                  <p className="text-sm md:text-base lg:text-lg xl:text-xl break-words">
-                    {key}: {String(value)}
-                  </p>
-                ))}
-              </DialogContent>
-            </Dialog>
-          ))
-        ) : (
-          <p className="text-2xl font-medium text-gray-700 opacity-50 pt-[0.5rem]">
-            {" "}
-            No Holded Credentials
-          </p>
-        )}
+      <div className="space-y-3">
+        <p className="text-2xl font-medium">Owned Credentials</p>
+        <div className="pt-2">
+          <ScrollArea className="h-[350px] rounded-md border p-4">
+            {ownedCredentialsCids.length > 0 ? (
+              ownedCredentialsCids.map((oc_cid: string, i: number) => (
+                <Dialog key={oc_cid}>
+                  <DialogTrigger>
+                    <Card className="cursor-pointer">
+                      <CardContent className="py-3 h-auto">
+                        <p className="break-all font-mono">{oc_cid}</p>
+                      </CardContent>
+                    </Card>
+                  </DialogTrigger>
+                  <DialogContent className="p-4">
+                    {ownedCredentials.length > 0
+                      ? Object.entries(ownedCredentials[i]).map(
+                          ([key, value]) => (
+                            <p key={key} className="break-all font-mono">
+                              <span className="font-bold">{key}</span>:{" "}
+                              {String(value)}
+                            </p>
+                          )
+                        )
+                      : null}
+                  </DialogContent>
+                </Dialog>
+              ))
+            ) : (
+              <p className="text-2xl font-medium text-gray-700 opacity-50 pt-2">
+                No Holded Credentials
+              </p>
+            )}
+          </ScrollArea>
+        </div>
       </div>
     </div>
   );
