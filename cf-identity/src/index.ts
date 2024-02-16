@@ -5,4 +5,5 @@ export { identity };
 export { types };
 export * from "./DI";
 export * from "./types/types";
-export { NFTStorage, File, Blob, CIDString };
+export { NFTStorage, File, Blob};
+export type { CIDString };
