@@ -20,6 +20,7 @@ contract DITest is Test {
 
     error MAX_DIDs_Created(uint256 _dids);
     error UNDEFINED_OR_EXPIRED_DID();
+    error InvalidDIDOwner();
 
     function setUp() public {
         diDeployScript = new DIDeployScript();
@@ -29,9 +30,9 @@ contract DITest is Test {
     function test_ShouldAssignDidToUser() public {
         vm.startPrank(issuer);
         di.assignDID(issuer_did);
-        string[] memory userDids = di.getDIDs();
+        string[] memory userDids = di.getDIDs(issuer);
         string memory expectedUserDid = userDids[0];
-        uint256 currentUserDidsLength = di.getDIDs().length;
+        uint256 currentUserDidsLength = di.getDIDs(issuer).length;
         assertEq(currentUserDidsLength, 1);
         assertEq(expectedUserDid, issuer_did);
         vm.stopPrank();
@@ -42,8 +43,7 @@ contract DITest is Test {
             vm.prank(issuer);
             di.assignDID(issuer_did);
         }
-        vm.prank(issuer);
-        uint256 user_dids = di.getDIDs().length + 1;
+        uint256 user_dids = di.getDIDs(issuer).length + 1;
         vm.expectRevert(
             abi.encodeWithSelector(MAX_DIDs_Created.selector, user_dids)
         );
@@ -53,12 +53,15 @@ contract DITest is Test {
 
     function test_ShouldIssueCredentialsToHolder() public {
         di.issueCredentials(issuer_did, holder_did, credential_hash);
+        vm.startPrank(holder);
+        di.assignDID(holder_did);
         string[] memory holder_credentials = di.getHoldedCredentials(
             holder_did
         );
         string[] memory issuer_credentials = di.getHoldedCredentials(
             holder_did
         );
+        vm.stopPrank();
         assertEq(holder_credentials.length, 1);
         assertEq(holder_credentials[0], credential_hash);
         assertEq(issuer_credentials.length, 1);
@@ -70,7 +73,35 @@ contract DITest is Test {
         di.assignDID("did:test:XYZ");
         string memory randomDID = "did:random:XYZ";
         vm.prank(issuer);
-        vm.expectRevert(abi.encodeWithSelector(UNDEFINED_OR_EXPIRED_DID.selector));
+        vm.expectRevert(
+            abi.encodeWithSelector(UNDEFINED_OR_EXPIRED_DID.selector)
+        );
         di.removeDID(randomDID);
+    }
+
+    function test_ShouldNotAllowCredentialsAccessToInvalidDidOwner() public {
+        vm.expectRevert(abi.encodeWithSelector(InvalidDIDOwner.selector));
+        vm.prank(issuer);
+        di.getHoldedCredentials(holder_did);
+    }
+
+    function test_ShouldAllowCredentialAccessToValidDidOwner() public {
+        vm.prank(holder);
+        di.assignDID(holder_did);
+        vm.prank(issuer);
+        di.assignDID(issuer_did);
+        di.issueCredentials(issuer_did, holder_did, credential_hash);
+        vm.prank(holder);
+        string[] memory holder_holded_credentials = di.getHoldedCredentials(
+            holder_did
+        );
+        vm.prank(issuer);
+        string[] memory issuer_issued_credentials = di.getIssuedCredentials(
+            issuer_did
+        );
+        assertEq(holder_holded_credentials.length, 1);
+        assertEq(holder_holded_credentials[0], credential_hash);
+        assertEq(issuer_issued_credentials.length, 1);
+        assertEq(issuer_issued_credentials[0], credential_hash);
     }
 }
