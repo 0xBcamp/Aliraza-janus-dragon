@@ -99,6 +99,41 @@ export class DecentralizeIdentity {
   };
 
   /**
+   * Authorizes the user to access the credential
+   * @param address - wallet address of the user to authorize the acccess
+   * @param cid - ipfs cid of the credential to allow access to
+   */
+  authorizeForCredentialAccess = async (
+    address: string,
+    cid: string
+  ): Promise<void> => {
+    try {
+      await this.contract.authroizeForCredentialAccess(address, cid);
+    } catch (error) {
+      throw new Error(String(error));
+    }
+  };
+
+  /**
+   * Revokes the user to access the credential
+   * @param address - wallet address of the user
+   * @param cid - ipfs cid of the credential to revoke access to
+   */
+  revokeCredentialAccess = async (
+    address: string,
+    cid: string
+  ): Promise<void> => {
+    try {
+      const isAuthorizedAlready: boolean =
+        await this.isAuthorizedForCredentialAccess(address, cid);
+      if (!isAuthorizedAlready) throw new Error("User not authorized!");
+      await this.contract.revokeCredentialAccess(address, cid);
+    } catch (error) {
+      throw new Error(String(error));
+    }
+  };
+
+  /**
    * Issue Credentials
    * @param data - an Object of type Credential containing the credential (object), holder address, holder did, issuer address, and issuer did
    * @returns the ipfs CID of the credential stored.
@@ -156,17 +191,22 @@ export class DecentralizeIdentity {
    * @param credential CID of the credential to verify
    * @returns verification check TRUE or FALSE
    */
-  verifyCredential = async (credential: string): Promise<boolean> => {
+  verifyCredential = async (
+    address: string,
+    credential: string
+  ): Promise<boolean> => {
     try {
-      const credentialData: any = await this.getCredentialData(credential);
-      const issuer_credentials: string[] =
-        await this.contract.getIssuedCredentials(credentialData.issuer_did);
-      const holder_credentials: string[] =
-        await this.contract.getHoldedCredentials(credentialData.holder_did);
-      return (
-        issuer_credentials.includes(credential) &&
-        holder_credentials.includes(credential)
+      const isAuthorized: boolean = await this.isAuthorizedForCredentialAccess(
+        address,
+        credential
       );
+      const credentialData: any = await this.getCredentialData(credential);
+      const verified: boolean = await this.contract.verifyCredential(
+        credential,
+        credentialData.issuer_did,
+        credentialData.holder_did
+      )
+      return verified;
     } catch (error) {
       throw new Error(String(error));
     }
@@ -183,17 +223,36 @@ export class DecentralizeIdentity {
   };
 
   /**
-   * @param did decentralize identifier of the user
-   * @returns all of the credentials, the user is holding
+   * @notice checks if the user is authorized to access the credential
+   * @param address wallet address of the user
+   * @param cid ipfs cid of the credential
+   * @returns a boolean indicating if the user is authorized to access the credential
    */
-  getHoldedCredentials = async (did: string): Promise<string[]> => {
-    const holded_credentials: string[] =
-      await this.contract.getHoldedCredentials(did);
-    return holded_credentials;
+  isAuthorizedForCredentialAccess = async (
+    address: string,
+    cid: string
+  ): Promise<boolean> => {
+    try {
+      const isAuthorized: boolean =
+        await this.contract.isAuthorizedForCredentialAccess(address, cid);
+      return isAuthorized;
+    } catch (error) {
+      throw new Error(String(error));
+    }
   };
 
   /**
-   *
+   * @param did decentralize identifier of the user
+   * @returns all of the credentials, the user is holding
+   */
+  getOwnedCredentials = async (did: string): Promise<string[]> => {
+    const owned_credentials: string[] = await this.contract.getOwnedCredentials(
+      did
+    );
+    return owned_credentials;
+  };
+
+  /**
    * @param address wallet address of the user
    * @returns the decentralize identifiers of the user
    */
@@ -206,11 +265,17 @@ export class DecentralizeIdentity {
     }
   };
 
+  /**
+   * @returns the maximum number of decentralized identifiers that can be created by each user
+   */
   getMaxDIDs = async (): Promise<number> => {
     const max_dids: number = await this.contract.maxDIDs();
     return max_dids;
   };
 
+  /**
+   * @returns the address of the smart contract
+   */
   getContractAddress = async (): Promise<string> => {
     const address: string = await this.contract.getAddress();
     return address;

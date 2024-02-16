@@ -1,13 +1,12 @@
 export const contract_address: string =
-  "0xFe8EC01a4BfA56c63D1E4354D58D35Dc428037f2";
+  "0xb508b96c873fFb6B4bEd49d97D1EC79893ECeeF2";
 export const contract_abi = [
-  { inputs: [], name: "InvalidDIDOwner", type: "error" },
   {
     inputs: [{ internalType: "uint256", name: "_dids", type: "uint256" }],
     name: "MAX_DIDs_Created",
     type: "error",
   },
-  { inputs: [], name: "UNDEFINED_OR_EXPIRED_DID", type: "error" },
+  { inputs: [], name: "UnauthorizedCredentialsAccess", type: "error" },
   {
     anonymous: false,
     inputs: [
@@ -49,16 +48,13 @@ export const contract_abi = [
     type: "function",
   },
   {
-    inputs: [{ internalType: "string", name: "did", type: "string" }],
-    name: "getDIDStatus",
-    outputs: [
-      {
-        internalType: "enum DecentralizeIdentity.DIDStatus",
-        name: "",
-        type: "uint8",
-      },
+    inputs: [
+      { internalType: "address", name: "user", type: "address" },
+      { internalType: "string", name: "cid", type: "string" },
     ],
-    stateMutability: "view",
+    name: "authroizeForCredentialAccess",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -70,7 +66,7 @@ export const contract_abi = [
   },
   {
     inputs: [{ internalType: "string", name: "did", type: "string" }],
-    name: "getHoldedCredentials",
+    name: "getIssuedCredentials",
     outputs: [
       { internalType: "string[]", name: "credentials", type: "string[]" },
     ],
@@ -79,10 +75,20 @@ export const contract_abi = [
   },
   {
     inputs: [{ internalType: "string", name: "did", type: "string" }],
-    name: "getIssuedCredentials",
+    name: "getOwnedCredentials",
     outputs: [
       { internalType: "string[]", name: "credentials", type: "string[]" },
     ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "user", type: "address" },
+      { internalType: "string", name: "cid", type: "string" },
+    ],
+    name: "isAuthorizedForCredentialAccess",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
     stateMutability: "view",
     type: "function",
   },
@@ -105,10 +111,35 @@ export const contract_abi = [
     type: "function",
   },
   {
-    inputs: [{ internalType: "string", name: "_did", type: "string" }],
+    inputs: [
+      { internalType: "uint256", name: "index", type: "uint256" },
+      { internalType: "string", name: "didToRemove", type: "string" },
+      { internalType: "string", name: "lastDid", type: "string" },
+    ],
     name: "removeDID",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "user", type: "address" },
+      { internalType: "string", name: "cid", type: "string" },
+    ],
+    name: "revokeCredentialAccess",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "string", name: "cid", type: "string" },
+      { internalType: "string", name: "issuer_did", type: "string" },
+      { internalType: "string", name: "holder_did", type: "string" },
+    ],
+    name: "verifyCredential",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
     type: "function",
   },
 ];

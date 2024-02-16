@@ -6,5 +6,3 @@ export { types };
 export * from "./DI";
 export * from "./types/types";
 export { NFTStorage, File, Blob, CIDString };
-
-
