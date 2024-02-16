@@ -83,11 +83,9 @@ contract DecentralizeIdentity {
     */
     function getIssuedCredentials(
         string memory did
-    ) external view returns (string[] memory credentials) {
+    ) public view returns (string[] memory credentials) {
         bool _isDidOwner = isDidOwner(did, msg.sender);
-        bool _isAuthrozied = isAuthorizedForCredentialAccess(msg.sender, did);
-        if (!_isDidOwner && !_isAuthrozied)
-            revert UnauthorizedCredentialsAccess();
+        if (!_isDidOwner) revert UnauthorizedCredentialsAccess();
         return didToIssuedCredentials[did];
     }
 
@@ -97,12 +95,39 @@ contract DecentralizeIdentity {
     */
     function getOwnedCredentials(
         string memory did
-    ) external view returns (string[] memory credentials) {
+    ) public view returns (string[] memory credentials) {
         bool _isDidOwner = isDidOwner(did, msg.sender);
-        bool _isAuthrozied = isAuthorizedForCredentialAccess(msg.sender, did);
-        if (!_isDidOwner && !_isAuthrozied)
-            revert UnauthorizedCredentialsAccess();
+        if (!_isDidOwner) revert UnauthorizedCredentialsAccess();
         return didToOwnedCredentials[did];
+    }
+
+    function verifyCredential(
+        string memory cid,
+        string memory issuer_did,
+        string memory holder_did
+    ) external view returns (bool) {
+        bool issuance_verified = false;
+        bool owned_verified = false;
+        bytes32 encodedCid = bytes32(abi.encodePacked(cid));
+        string[] memory issuer_issued_creds = didToIssuedCredentials[
+            issuer_did
+        ];
+        string[] memory holder_owned_creds = didToOwnedCredentials[holder_did];
+        for (uint256 i = 0; i < issuer_issued_creds.length; i++) {
+            if (
+                bytes32(abi.encodePacked(issuer_issued_creds[i])) == encodedCid
+            ) {
+                issuance_verified = true;
+            }
+        }
+        for (uint256 i = 0; i < holder_owned_creds.length; i++) {
+            if (
+                bytes32(abi.encodePacked(holder_owned_creds[i])) == encodedCid
+            ) {
+                owned_verified = true;
+            }
+        }
+        return issuance_verified && owned_verified;
     }
 
     function isDidOwner(

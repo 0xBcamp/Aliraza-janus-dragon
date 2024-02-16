@@ -54,12 +54,8 @@ contract DITest is Test {
         di.issueCredentials(issuer_did, holder_did, credential_hash);
         vm.startPrank(holder);
         di.assignDID(holder_did);
-        string[] memory holder_credentials = di.getOwnedCredentials(
-            holder_did
-        );
-        string[] memory issuer_credentials = di.getOwnedCredentials(
-            holder_did
-        );
+        string[] memory holder_credentials = di.getOwnedCredentials(holder_did);
+        string[] memory issuer_credentials = di.getOwnedCredentials(holder_did);
         vm.stopPrank();
         assertEq(holder_credentials.length, 1);
         assertEq(holder_credentials[0], credential_hash);
@@ -73,11 +69,13 @@ contract DITest is Test {
         string memory randomDID = "did:random:XYZ";
         vm.prank(issuer);
         vm.expectRevert();
-        di.removeDID(1,randomDID, randomDID);
+        di.removeDID(1, randomDID, randomDID);
     }
 
     function test_ShouldNotAllowCredentialsAccessToInvalidDidOwner() public {
-        vm.expectRevert(abi.encodeWithSelector(UnauthorizedCredentialsAccess.selector));
+        vm.expectRevert(
+            abi.encodeWithSelector(UnauthorizedCredentialsAccess.selector)
+        );
         vm.prank(issuer);
         di.getOwnedCredentials(holder_did);
     }
@@ -100,5 +98,18 @@ contract DITest is Test {
         assertEq(holder_owned_credentials[0], credential_hash);
         assertEq(issuer_issued_credentials.length, 1);
         assertEq(issuer_issued_credentials[0], credential_hash);
+    }
+
+    // Verify Credential
+
+    function test_ShouldReturnTrueOnValidCredential() public {
+        vm.prank(issuer);
+        di.issueCredentials(issuer_did, holder_did, credential_hash);
+        bool isValidCredential = di.verifyCredential(
+            credential_hash,
+            issuer_did,
+            holder_did
+        );
+        assert(isValidCredential == true);
     }
 }
