@@ -1,6 +1,6 @@
 {
   "name": "cf-identity",
-  "version": "1.1.2",
+  "version": "1.1.4",
   "description": "A package from ChainFusion to manage your identities in a decentralized way.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
