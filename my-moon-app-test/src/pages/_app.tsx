@@ -1,3 +1,4 @@
+"use client";
 import {
 	EmailLoginInput,
 	EmailSignupInput,
@@ -16,6 +17,10 @@ import { LightSmartContractAccount, getDefaultLightAccountFactoryAddress } from 
 import Web3 from 'web3';
 import { ethers } from 'ethers';
 import { convertEthersSignerToAccountSigner } from '@alchemy/aa-ethers';
+import LandingPage from './page';
+
+import '../styles/globals.css'
+import Navbar from './navbar';
 
 require('dotenv').config();
 
@@ -300,7 +305,7 @@ const SignupPage: React.FC = () => {
         target: "0xB043083EcF02012b58FBCDe05234AB6818334Cc1",
         data: uoCallData,
       },
-      elligibility ? undefined : overrides // for ineligible user operations, set the paymasterAndData override
+      elligibility ? undefined : overrides // for ineligible x`Ar operations, set the paymasterAndData override
     );
 
     const txHash = await alchemyProvider?.waitForUserOperationTransaction(uo!.hash);
@@ -438,8 +443,9 @@ const SignupPage: React.FC = () => {
     </>
   );
 
+const Login = () => {
 	return (
-		<div className="flex justify-center items-center h-screen">
+		<div className="">
 			{!isConnected && (
 				<div>
 					<h2 className="text-2xl font-bold mb-4 text-center">
@@ -559,6 +565,13 @@ const SignupPage: React.FC = () => {
 				</div>
 			)}
 		</div>
+	);}
+
+	return (
+		<>
+			<Navbar Login={Login}></Navbar>
+			<LandingPage />
+		</>
 	);
 };
 
