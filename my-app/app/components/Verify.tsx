@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { IdentityContext, WalletContext } from "@/providers/Providers";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useContext, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { toast } from "sonner";
 
 const Verify = () => {
@@ -15,6 +15,15 @@ const Verify = () => {
   const router = useRouter();
   const pathName = usePathname();
   const searchParams = useSearchParams();
+
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set(name, value)
+      return params.toString()
+    },
+    [searchParams]
+  )
 
   const verifyCredential = async () => {
     if (wallet.isConnected) {
@@ -28,6 +37,7 @@ const Verify = () => {
           toast.error("Invalid Credential CID");
         }
       } catch (error) {
+        setIsVerified(false);
         console.log(error);
         toast.error(String(error));
       }
@@ -43,7 +53,7 @@ const Verify = () => {
         <Input
           className="w-[24rem]"
           onChange={(e) =>
-            router.push(pathName + "?" + `cid=${e.target.value}`)
+            router.push(pathName + '?' + createQueryString('cid', e.target.value))
           }
         />
         <Button className="w-28" onClick={verifyCredential}>
