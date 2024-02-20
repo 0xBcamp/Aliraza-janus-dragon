@@ -6,75 +6,105 @@
 
 ---
 
+## BCamp Assignments
 
+This project was created during the BCamp Apprenticeship, which combines elements of both a traditional internship and a hackathon to provide a personalized learning experience, professional networking opportunities, insights into blockchain development, and job opportunities. Below are the assignments completed throughout the program.
 
-https://github.com/0xBcamp/Aliraza-janus-dragon/assets/32830427/c13c5f82-ed77-4b0c-8c0e-ca489379ca3d
-
-
-
-**⚠️ Mandatory Briefing: It is imperative that you play the vidoe file above before proceeding. This message contains critical information crucial for the successful execution of your mission.**
+| Week | Assignment | Presenation/GitHub Link |
+|------|-------------|-----------------|
+| 2 | Project Proposal | [Link to Presentation](https://docs.google.com/presentation/d/1lEkVyjoo5Zr0V011mjTMbf9pG1IrEYAK3jStaEQmRVo/edit?usp=sharing) |
+| 3 | Pseudo Smart Contract Code | [Link to Presentation](https://docs.google.com/presentation/d/1yWUgXtm6lij5OQzSvt0Tix77zfmeufPzX0gL8MIKs3w/edit?usp=sharing) |
+| 4 | Front-End Development | [Link to Front End](https://chainfusion-identity-muhammad-masood.vercel.app) |
+| 5 | Smart Contract Security Review | [Link to Review Presentation](https://docs.google.com/presentation/d/17FzPrsQ-nVtAdCFfkGKfgrfZQrxt6z6R4Zg/edit?usp=sharing) |
+| 6 | Final Presentation | [Link to Securiy Review GitHub](https://docs.google.com/presentation/d/1-t1IVxE2sAzlYxzaDFmDW6TfCSWSqr1XAy7wzK6Im6U/edit?usp=sharing) |
 
 ---
 
 ## Table of Contents
 
 - [ChainFusion ID \& Finance Hub](#chainfusion-id--finance-hub)
-  - [Introduction](#introduction)
-  - [The Challenge](#the-challenge)
-  - [The Solution](#the-solution)
-  - [Why It Matters](#why-it-matters)
-  - [Key Features](#key-features)
-  - [Impact in the Market and Future](#impact-in-the-market-and-future)
-  - [Blueprint of Innovation](#blueprint-of-innovation)
-  - [Knowledge Is Our Stronghold](#knowledge-is-our-stronghold)
-  - [Examples README to follow](#examples-readme-to-follow)
+- [Introduction](#introduction)
+- [Key Features](#key-features)
+- [Impact in the Market and Future](#impact-in-the-market-and-future)
+
 
 ---
 
 ## Introduction
 
-<div align="center">
-    🌐 <b>The Epoch of Blockchain Evolution</b>
-</div>
+In the digital age, our identity is more than just our name or our face. It's an intricate web of data that encompasses everything from our email addresses and social media profiles to our online shopping habits and even our network of friends. This digital identity plays a crucial role in our lives, enabling us to interact in the digital world, access services, and connect with others.
 
-In a world increasingly dominated by sophisticated AI systems, a new vanguard is necessary to maintain the balance between human agency and automated control. This platform, a pioneering initiative in the realm of blockchain and AI integration, is not merely a technological advancement; it's a critical line of defense in an era marked by the rise of AI products and the looming threat of AI-driven cyber incursions.
+However, in the current system, these digital identities are often controlled by centralized entities such as social media platforms, email providers, or other online services. These entities store our personal data on their servers and use it to verify our identity when we want to access their services. This centralized control has led to numerous problems.
 
-Our initiative is a beacon of hope, a fusion of blockchain's immutable security and AI's dynamic adaptability. This project transcends conventional digital paradigms, offering a stronghold of safety and user-focused design in the unpredictable terrain of the digital world. It's a venture poised to reshape the narrative of blockchain technology, elevating it from a complex, niche tool to an essential, intuitive element of daily digital interactions. In facing the tide of AI advancements, this project stands as a sentinel, safeguarding the essence of human-driven digital experiences in the blockchain sphere.
+Firstly, users have little control over their own personal data. It's often unclear what data is being collected, how it's being used, and who it's being shared with. Secondly, these centralized databases are prime targets for hackers, leading to frequent data breaches and leaks of personal information. Lastly, the centralized control of identities leads to issues of privacy. Users often have to share more information than necessary, leading to an invasion of personal privacy.
 
-## The Challenge
+Decentralized Identity (DID) offers a solution to these problems. It's a new approach to digital identity that gives control back to the individual. With DID, your identity is not stored on a centralized server, but instead, you hold it and control it directly. This means you have full control over what personal data you share, who you share it with, and how it's used.
 
-🌐 In a world increasingly dominated by technology, we stand at a critical juncture. The digital realm is evolving at an unprecedented pace, with blockchain and decentralized finance (DeFi) leading the charge. Yet, these powerful systems pose significant challenges in terms of complexity and accessibility. The greater threat, however, comes from the shadowy advancements in AI - from deepfakes to AI-driven cyber attacks, the digital landscape is fraught with perils that could undermine the very fabric of our digital autonomy and security.
+In the following sections, we'll delve deeper into what Decentralized Identity is, why it's important, and how our DID Toolkit can help you implement this revolutionary approach to digital identity.
 
-## The Solution
+## Getting Started
 
-🛡️ Enter our pioneering platform - a beacon of resilience in this era of digital uncertainty. This platform is not merely a technological advancement; it is a shield against the burgeoning threats of AI-dominated cyberspace. Harnessing the strength of Moon Wallet's avant-garde technologies, it offers a sanctuary of security and simplicity. This platform serves as a conduit, channeling the formidable force of blockchain to empower users, and providing developers with a robust toolkit to combat the ever-growing complexities of AI infiltration in our digital lives.
+To get started with the Chain Fusion Decentralized Identity Kit, follow these steps:
 
-## Why It Matters
+1. **Install the Package**: Install the npm package `chainfusion-identity-kit` in your project:
 
-💡 In the race to a future where digital and physical realities converge, our platform is more than just a tool - it's a necessity. It stands as a bastion of hope against the rising tide of AI-induced chaos, offering clarity and control in the often opaque waters of blockchain and AI interactions. This platform is pivotal because it returns control to where it belongs - in the hands of the users, ensuring that the trajectory of blockchain technology is guided by human values and needs, not by the obscure agendas of autonomous AI entities.
+   ```
+   npm install chainfusion-identity-kit
+   ```
+
+2. **Import and Initialize**: Import the necessary modules and initialize the `DecentralizeIdentity` class with the required parameters, such as signer and storage secret key.
+
+   ```javascript
+   import { DecentralizeIdentity } from 'chainfusion-identity-kit';
+
+   // Initialize DecentralizeIdentity
+   const di = new DecentralizeIdentity(signer, storage_secret_key);
+   ```
+
+3. **Start Using the Kit**: Use the provided functionalities such as creating DIDs, issuing VCs, and verifying credentials in your application.
+
+   ```javascript
+   // Example: Create a DID
+   const did = di.createDID();
+
+   // Example: Issue Verifiable Credential
+   const credential = { /* credential data */ };
+   di.issueCredential(credential);
+
+   // Example: Verify Credential
+   const isCredentialValid = di.verifyCredential(credential);
+   ```
 
 ## Key Features
 
 <div align="center">
-    🎯 <b>Carving a Path Towards Digital Renaissance</b>
+    <b>Decentralized Identity SDK</b>
 </div>
 
-This integrated platform would offer a robust toolkit for developers and users in the decentralized finance (DeFi) ecosystem. Key features would include:
+### Our Decentralized Identity (DID) Software Development Kit (SDK)
 
-- **ERC-4337 Account Abstraction Toolkit:** A set of tools and APIs for developers to seamlessly integrate ERC-4337 Account Abstraction into DeFi applications. This would simplify wallet creation and management, making it more user-friendly and accessible.
+Our SDK is a comprehensive toolkit designed to empower developers and users in the burgeoning decentralized finance (DeFi) ecosystem. It offers a suite of features that address the unique challenges of identity management in the DeFi space.
 
-- **Decentralized Identity Verification Module:** Leveraging blockchain technology for secure and verifiable user identity management. This module would ensure that users can prove their identity without compromising privacy, essential for KYC (Know Your Customer) and anti-money laundering (AML) compliance in financial applications.
+### Decentralized Identity Verification Module
 
-- **Comprehensive DeFi Dashboard:** A user-friendly interface that aggregates various DeFi services like lending, borrowing, staking, and yield farming. The dashboard would utilize Moon Wallet's features for secure transactions and account management.
+This module leverages the power of blockchain technology to provide secure and verifiable user identity management. It ensures that users can establish their identity in a way that respects their privacy and autonomy, a critical requirement for KYC (Know Your Customer) and AML (Anti-Money Laundering) compliance in financial applications. This module puts users in control of their data, allowing them to manage their digital identities without relying on a centralized authority.
 
-- **Subscription Management System for Web3 Services:** A system to handle subscriptions for various Web3 services, integrated with the DeFi dashboard. This would allow users to manage recurring payments for services within the DeFi ecosystem, using cryptocurrency and smart contract functionalities.
+### Issuing Credentials
 
-This platform aims to provide a one-stop solution for both developers and end-users in the DeFi space, enhancing user experience, security, and functionality. It would be particularly beneficial for those looking to engage with DeFi services in a more integrated and streamlined manner.
+Our SDK provides a robust mechanism for issuing credentials. This feature allows issuers to create, distribute, and manage access to credentials. It offers the flexibility to adjust access permissions, including the ability to revoke them. This ensures that users have the appropriate level of access at all times, enhancing security and efficiency.
+
+### Credential Verification
+
+Our SDK includes a powerful credential verification feature. This allows third parties to verify the authenticity of the credentials presented by users quickly and accurately. It uses advanced cryptographic techniques to ensure that the credentials are genuine and have been issued by a trusted entity. This feature enhances trust and security in the DeFi ecosystem.
+
+### Conclusion
+
+Our DID SDK is more than just a toolkit; it's a gateway to a new era of digital identity management. By providing developers and users with the tools they need to navigate the DeFi landscape, we're helping to shape a future where digital identities are secure, private, and user-controlled.
 
 ## Impact in the Market and Future
 
 <div align="center">
-    💥 <b>Envisioning a Future Forged by Innovation</b>
+    <b>Envisioning a Future Forged by Innovation</b>
 </div>
 
 ChainFusion is poised to be a catalyst in the blockchain and DeFi realms by:
@@ -83,68 +113,22 @@ ChainFusion is poised to be a catalyst in the blockchain and DeFi realms by:
 - **Accelerating Blockchain Integration**: Paving the way for seamless adoption of blockchain across diverse sectors.
 - **Igniting a Chain Reaction of Innovations**: Setting the stage for future advancements, inspiring new blockchain functionalities and services.
 
-## Blueprint of Innovation
+## Knowledge
 
-<div align="center">
-    🛠 <b>Architecting the Future</b>
-</div>
-
-**Building the Digital Eden:**
-- **Frontend Mastery**: Crafting an interface that embodies the future - visually stunning, intuitively navigable, and a testament to our commitment to excellence.
-- **Backend Fortress**: Constructing a backend that is not just robust but a labyrinth of secure, scalable, and seamless integrations, including Moon Wallet’s APIs.
-- **Smart Contracts Alchemy**: Ensuring each smart contract is a tapestry of security, efficiency, and transparency, woven with the threads of blockchain technology.
-- **Blockchain Symphony**: Harmonizing various blockchain technologies to create a diverse yet unified digital ecosystem.
-
-**Epic of Development:**
-1. **Genesis of Concepts**: Embarking on a journey to envision and design the functionalities and aesthetics of ChainFusion.
-2. **Forge of Creation**: Leveraging the Moon Wallet SDK and a plethora of resources to sculpt our vision into reality.
-3. **Crucible of Trials**: Subjecting our creation to a gauntlet of tests, ensuring its fortitude and readiness.
-4. **Ascension of Deployment**: Launching ChainFusion into the orbit of public use, marking a new chapter in blockchain technology.
-5. **Epoch of Evolution**: Committing to a path of continuous improvement, adapting to the ever-changing digital landscape.
-
-## Knowledge Is Our Stronghold
-
-<div align="center">
-    📚 <b>Dive into the Depths of Our Resources</b>
-</div>
-
-Embark on a journey through the resources that fuel the heart of ChainFusion:
+Here are some of our resources:
 
 - **Moon Wallet Odyssey**: [Discover Moon Wallet's capabilities](https://usemoon.ai/), the foundational cornerstone of ChainFusion.
-- **Moon SDK Chronicles**: [Explore practical applications of Moon SDK](https://github.com/moon-up/moon-sdk/tree/main/examples/moon-siwe-sdk-example) and draw integration inspiration.
-- **Moon SDK Packages**: [Explore all the packages regarding Moon SDK](https://github.com/moon-up/moon-sdk/tree/main/packages) for proper integration and installation. These packages have:
-  - Moon-API is the core API call logic
-  - Moon-ethers is ethers.js provider and signer classes
-  - Moon-rainbowkit allows you to plug moon into rainbow kit
-  - Moon-react is a work in progress but will eventually contain a lot of boilerplate components and hooks for moon
-  - Moon-sdk is the core logic which contains all session management logic as well as ensuring compatiblity to the wider ecosystem.
-  - Moon-types is for shared typings across the moon-sdk project
-  - Moon-wagmi-connector is a wagmi connector
-- **Moon Auth Token**: With moon-sdk we create an instance of the sub api classes in the moon-sdk and expose them and then also set tokens on updates with all of them.
-  - [Configuration snippet security-related settings for AccountsSDK](https://github.com/moon-up/moon-sdk/blob/main/packages/moon-sdk/src/moon.ts#L400)
-  - [Configuration snippet for initializing an instance of Accounts](https://github.com/moon-up/moon-sdk/blob/main/packages/moon-sdk/src/moon.ts#L84)
-  - [Authorization header using a JWT (JSON Web Token)](https://github.com/moon-up/moon-sdk/blob/main/packages/moon-sdk/src/auth.ts#L3)
-- **Example Moon Apps**: Some example moon apps to consider for learning and proper understanding on how to integrate Moon wallet with any project
-  - [Moon authentication chat example](https://github.com/moon-up/moon-sdk/tree/main/examples/moon-sdk-authentication-chat-example-app)
-  - [Working BCAMP tutorial by Gerdusx](https://github.com/0xBcamp/Gerdusx-janus-dragon/tree/main/bcamp-tutorial/client)
-- **Accounts API Codex**: [Unravel the secrets of the Accounts API](https://github.com/moon-up/moon-sdk-python/blob/main/docs/AccountsApi.md) for backend prowess.
-- **AI Integration Saga**: [Delve into AI integration](https://python.langchain.com/docs/integrations/tools/chatgpt_plugins) to enhance ChainFusion's capabilities.
-- **Moon SIWE Epic**: [Examine a live example](https://github.com/ewhal/moon-siwe-example/blob/main/web/src/index.js) of Moon Wallet’s integration and strength.
-- **React Hooks Enigma**: [Uncover the mysteries of Moon React hooks](https://github.com/moon-up/moon-sdk/blob/main/packages/moon-react/src/hooks/useMoon.ts) for intuitive UI design.
-- **Moon API Tome**: [Navigate the comprehensive Moon API](https://docs.usemoon.ai/api) for advanced functionality insights.
-- **Python SDK Scrolls**: [Embark on a journey with Moon SDK's Python documentation](https://github.com/moon-up/moon-sdk-python/tree/main/docs) for Python-based integrations.
-- **Master Plan Compendium**: [Access the detailed master plan](https://docs.google.com/document/d/1Muqq1OAqLg6gQ6A1pycl0cTqAu4x08INJrXFW5Mn9v4/edit) for deep strategic insights.
+- **Moon SDK Reference**: [Discover Moon API on Github](https://github.com/moon-up/moon-sdk) and draw integration inspiration.
+
+
+## Contribution
+
+Contributions to the Chain Fusion Decentralized Identity Kit are welcome! If you encounter any issues or have suggestions for improvements, feel free to open an issue or submit a pull request on the [GitHub repository](https://github.com/chainfusion/identity-kit).
+
+With the Chain Fusion Decentralized Identity Kit, managing digital identities becomes easier, more secure, and decentralized. Start integrating it into your applications today for seamless identity management and verification!
+
+## License
 
 ---
 
-<div align="center">
-    🚀 <i>Your mission to reshape the digital cosmos begins now. Embark on this journey with valor and vision. Godspeed, apprentice.</i>
-</div>
-
----
-
-
-## Examples README to follow
-- Homechain https://github.com/0xBcamp/March-2023-Lima
-- SmartVault https://github.com/0xBcamp/March-2023-Sierra
-- Blockbadge https://github.com/0xBcamp/Sept23_Apprenticeship_Certification
+This project is licensed under the MIT License.
