@@ -1,0 +1,6 @@
+src/test
+jest.config.js
+tsconfig.json
+nodemon.json
+node_modules
+.env
