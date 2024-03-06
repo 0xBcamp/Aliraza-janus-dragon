@@ -50,15 +50,62 @@ export default function Home() {
             </p>
           </div>
         </div>
+        <div className="mt-8">
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
+            Chain Fusion Decentralized Identity Kit
+          </h2>
+          <p className="text-lg lg:text-xl text-gray-600 mb-4">
+            The Chain Fusion Decentralized Identity Kit simplifies the process
+            of managing and verifying users' identities digitally. It offers
+            various functionalities to support decentralized identity management
+            seamlessly.
+          </p>
+          <h3 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-4">
+            Features
+          </h3>
+          <ul className="list-disc list-inside text-lg lg:text-xl text-gray-600 mb-4">
+            <li>Creating DIDs (Decentralized Identifiers)</li>
+            <p>
+              DIDs are unique identifiers for users, associated with their
+              private keys, and entirely owned and governed by them. With this
+              kit, users can create as many DIDs as they want, each representing
+              separate profiles for their credentials.
+            </p>
+            <li>Issue VCs (Verifiable Credentials)</li>
+            <p>
+              The kit allows users to issue verifiable credentials (VCs) to
+              other users. These credentials contain attestation information and
+              are cryptographically signed by the issuer, providing a secure and
+              tamper-proof way to verify users' attributes and qualifications.
+            </p>
+            <li>Verify Credentials</li>
+            <p>
+              Users can verify the authenticity and validity of credentials
+              issued by others using this kit. By providing verification
+              mechanisms, it ensures trust and reliability in the digital
+              identity ecosystem.
+            </p>
+          </ul>
+          <footer className="text-center">
+            <Link
+              href="https://www.npmjs.com/package/cf-identity"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-500 hover:text-gray-700"
+            >
+              Install Chain Fusion Decentralized Identity Kit
+            </Link>
+          </footer>
+        </div>
         <footer className="mt-8 text-center">
-          <a
-            href="https://github.com/0xBcamp/Aliraza-janus-dragon/tree/newFeatureBranch"
+          <Link
+            href="https://github.com/0xBcamp/Aliraza-janus-dragon"
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-500 hover:text-gray-700"
           >
             View on GitHub
-          </a>
+          </Link>
         </footer>
       </div>
     </div>
