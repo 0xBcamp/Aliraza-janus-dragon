@@ -76,7 +76,7 @@ const Dids = () => {
             ))}
           </ScrollArea>
         ) : (
-          <p className="text-2xl font-medium text-gray-600 opacity-45 self-center">
+          <p className="text-2xl font-medium text-white opacity-45 self-center">
             No DID Found
           </p>
         )}

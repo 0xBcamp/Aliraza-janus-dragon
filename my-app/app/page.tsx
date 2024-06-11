@@ -1,6 +1,7 @@
 import Image from "next/image";
 import image from "@/public/image.svg";
 import image2 from "@/public/image2.svg";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -56,7 +57,7 @@ export default function Home() {
           </h2>
           <p className="text-lg lg:text-xl text-gray-600 mb-4">
             The Chain Fusion Decentralized Identity Kit simplifies the process
-            of managing and verifying users' identities digitally. It offers
+            of managing and verifying users&apos; identities digitally. It offers
             various functionalities to support decentralized identity management
             seamlessly.
           </p>
@@ -76,7 +77,7 @@ export default function Home() {
               The kit allows users to issue verifiable credentials (VCs) to
               other users. These credentials contain attestation information and
               are cryptographically signed by the issuer, providing a secure and
-              tamper-proof way to verify users' attributes and qualifications.
+              tamper-proof way to verify users&apos; attributes and qualifications.
             </p>
             <li>Verify Credentials</li>
             <p>
